@@ -70,7 +70,7 @@ def signup():
             )
             db.session.add(user)
             db.session.commit()
-            return redirect(url_for('list_all_books'))  
+            return redirect(url_for('dashboards/user_dashboard.html'))  
 
 
 @app.route('/logout')
@@ -86,7 +86,7 @@ def list_all_books():
     sections = db.session.query(Section).all()
     authors = db.session.query(Book).distinct(Book.author).all()
     return render_template(
-        'books.html', books=books, sections=sections, authors=authors
+        'books/books.html', books=books, sections=sections, authors=authors
     )
 
 
@@ -103,7 +103,7 @@ def list_books_by_filter(filter: str):
         return render_template('404_template.html', error='Invalid Filter')
 
     return render_template(
-        'templates/books/books.html', books=books, section=section, author=author
+        'books/books.html', books=books, section=section, author=author
     )
 
 

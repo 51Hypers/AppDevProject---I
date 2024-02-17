@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Book Actions</title>
+</head>
+<body>
+    <h1>Book Actions</h1>
+
+    <!-- Display books available for request -->
+    <h2>Request a Book</h2>
+    {% for book in available_books %}
+    <div>
+        <p>{{ book.name }} by {{ book.author }}</p>
+        <form action="{{ url_for('request_book', book_id=book.id) }}" method="post">
+            <button type="submit">Request Book</button>
+        </form>
+    </div>
+    {% endfor %}
+
+    <!-- Display books the user has borrowed and can return -->
+    <h2>Return a Book</h2>
+    {% for borrowed_book in borrowed_books %}
+    <div>
+        <p>{{ borrowed_book.book.name }} (Borrowed)</p>
+        <form action="{{ url_for('return_book', user_book_id=borrowed_book.id) }}" method="post">
+            <button type="submit">Return Book</button>
+        </form>
+    </div>
+    {% endfor %}
+
+</body>
+</html>
