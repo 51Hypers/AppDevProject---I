@@ -104,21 +104,20 @@ def list_all_books():
     )
 
 
-@app.route('/books/<filter>', methods=['GET'])
-def list_books_by_filter(filter: str):
-    section_id = request.args.get('section_id')
-    author = request.args.get('author')
-    if filter == 'section':
-        section = db.session.query(Section).filter(Section.id == section_id).one()
-        books = db.session.query(Book).filter(Book.section_id == section_id).all()
-    elif filter == 'author':
-        books = db.session.query(Book).filter(Book.author == author).all()
-    else:
-        return render_template('404_template.html', error='Invalid Filter')
+@app.route('/books/filter', methods=['GET'])
+def list_books_by_filter():
+    filter_type = request.args.get('filter_type')
+    query = request.args.get('query', '')
 
-    return render_template(
-        'books/books_filter.html', books=books, section=section, author=author
-    )
+    if filter_type == 'section':
+        section_id = request.args.get('section_id')
+        books = Book.query.filter(Book.section_id == section_id, Book.name.ilike(f"%{query}%")).all()
+    elif filter_type == 'author':
+        books = Book.query.filter(Book.author.ilike(f"%{query}%"), Book.name.ilike(f"%{query}%")).all()
+    else:
+        books = Book.query.filter(Book.name.ilike(f"%{query}%")).all()
+
+    return render_template('books/books_filter.html', books=books)
 
 
 @app.route('/books/view/<book_id>', methods=['GET'])
@@ -159,7 +158,7 @@ def request_book(book_id):
     db.session.add(new_request)
     db.session.commit()
  
-    flash('Book request submitted successfully!', 'success')
+    # flash('Book request submitted successfully!', 'success')
     return render_template_string('<h1> Request Submission Successful!<h1>')
 
 
