@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <!-- Ensure you link your CSS correctly -->
+    <link rel="stylesheet" href="<!-- Your CSS file link here, if any -->">
+    <style>
+        .error-message {
+            color: red;
+            margin-bottom: 15px;
+        }
+        .back-to-home {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <h2>Login</h2>
+    <!-- Display flashed messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        <div class="error-message">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <form action="/login" method="post">
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit">Login</button>
+    </form>
+    <div class="back-to-home">
+        <a href="{{ url_for('index') }}">Back to Home Page</a>
+    </div>
+</div>
+
+</body>
+</html>
