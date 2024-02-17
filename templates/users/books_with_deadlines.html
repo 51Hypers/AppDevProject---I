@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Borrowed Books and Deadlines</title>
+</head>
+<body>
+    <h1>My Borrowed Books and Their Deadlines</h1>
+    {% if books_with_deadlines %}
+        {% for item in books_with_deadlines %}
+        <div>
+            <h2>{{ item.book.name }} by {{ item.book.author }}</h2>
+            <p>Deadline: {{ item.deadline.strftime('%Y-%m-%d') }}</p>
+            <p>Days until deadline: {{ item.days_until_deadline }}</p>
+            <!-- Return Book Form -->
+            <form action="{{ url_for('return_book', user_book_id=item.user_book.id) }}" method="post">
+                <input type="submit" value="Return Book">
+            </form>
+        </div>
+        {% endfor %}
+    {% else %}
+    <p>You have no borrowed books.</p>
+    {% endif %}
+</body>
+</html>

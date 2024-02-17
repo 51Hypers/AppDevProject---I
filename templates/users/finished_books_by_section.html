@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Finished Reading by Section</title>
+</head>
+<body>
+    <h1>Books I've Finished Reading, Organized by Section</h1>
+    {% if books_by_section %}
+        {% for section, books in books_by_section.items() %}
+            <h2>Section: {{ section }}</h2>
+            {% for item in books %}
+            <div>
+                <h3>{{ item.book.name }} by {{ item.book.author }}</h3>
+                <p>Returned On: {{ item.user_book.t_return.strftime('%Y-%m-%d') }}</p>
+            </div>
+            {% endfor %}
+        {% endfor %}
+    {% else %}
+    <p>You have not finished any books.</p>
+    {% endif %}
+</body>
+</html>

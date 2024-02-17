@@ -3,31 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Books List</title>
-    <!-- Link to your CSS file here -->
     <link rel="stylesheet" href="path_to_your_stylesheet.css">
 </head>
 <body>
 
 <div class="container">
     <h1>Books List</h1>
-    
-    <section class="sections">
-        <h2>Sections</h2>
-        <ul>
-            {% for section in sections %}
-                <li>{{ section.name }}</li>
-            {% endfor %}
-        </ul>
-    </section>
-
-    <section class="authors">
-        <h2>Authors</h2>
-        <ul>
-            {% for author in authors %}
-                <li>{{ author.author }}</li> <!-- Adjust if your author attribute is named differently -->
-            {% endfor %}
-        </ul>
-    </section>
 
     <section class="books">
         <h2>Books</h2>
@@ -37,6 +18,7 @@
                     <th>Title</th>
                     <th>Author</th>
                     <th>Section</th>
+                    <th>Action</th> <!-- New column for actions -->
                 </tr>
             </thead>
             <tbody>
@@ -45,6 +27,9 @@
                     <td>{{ book.name }}</td>
                     <td>{{ book.author }}</td>
                     <td>{{ book.section.name }}</td> <!-- Adjust according to your model relationships -->
+                    <td>
+                        <a href="{{ url_for('request_book', book_id=book.id) }}" class="btn btn-primary">Request</a>
+                    </td> <!-- Ensure you have defined 'request_book' route and 'book.id' is the correct identifier -->
                 </tr>
                 {% endfor %}
             </tbody>

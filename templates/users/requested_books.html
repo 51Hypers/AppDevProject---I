@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Requested Books Awaiting Approval</title>
+</head>
+<body>
+    <h1>Requested Books Awaiting Approval</h1>
+    {% if requested_books %}
+        <ul>
+            {% for user_book, book in requested_books %}
+            <li>
+                <strong>{{ book.name }}</strong> by {{ book.author }} 
+                <br>
+                Requested on: {{ user_book.t_request.strftime('%Y-%m-%d %H:%M:%S') }}
+                {% if user_book.is_rejected %}
+                <span style="color: red;">Rejected</span>
+                {% else %}
+                <span style="color: orange;">Awaiting Approval</span>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No books requested or all requests have been processed.</p>
+    {% endif %}
+</body>
+</html>

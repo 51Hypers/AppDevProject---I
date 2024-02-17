@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filter Books</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-3">
+    <h2>Filter Books</h2>
+    <div class="row">
+        <div class="col-md-4">
+            <form action="/books/section" method="get">
+                <div class="form-group">
+                    <label for="sectionSelect">Filter by Section</label>
+                    <select class="form-control" id="sectionSelect" name="section_id" onchange="this.form.submit()">
+                        <option value="">Select a Section</option>
+                        {% for section in sections %}
+                        <option value="{{ section.id }}">{{ section.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-4">
+            <form action="/books/author" method="get">
+                <div class="form-group">
+                    <label for="authorInput">Filter by Author</label>
+                    <input type="text" class="form-control" id="authorInput" name="author" placeholder="Author Name">
+                </div>
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h3>Books</h3>
+            <ul class="list-group">
+                {% for book in books %}
+                <li class="list-group-item">
+                    {{ book.name }} by {{ book.author }}
+                    <!-- Add your book request button or link here if needed -->
+                </li>
+                {% else %}
+                <li class="list-group-item">No books found.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

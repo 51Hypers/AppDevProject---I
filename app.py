@@ -1,6 +1,9 @@
 import datetime
+from io import BytesIO
+import pandas as pd
+from matplotlib import pyplot as plt
 from nit import app, db
-from flask import render_template, request, redirect, url_for, session, flash
+from flask import render_template, render_template_string, request, redirect, send_file, url_for, session, flash
 from models import User, Section, Book, UserBook
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -17,6 +20,9 @@ def login_required(f):
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
+
+
+# <-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------> #
 
 
 # INDEX VIEWS
@@ -70,7 +76,7 @@ def signup():
             )
             db.session.add(user)
             db.session.commit()
-            return redirect(url_for('dashboards/user_dashboard.html'))  
+            return redirect(url_for('user_dashboard'))  
 
 
 @app.route('/logout')
@@ -79,7 +85,15 @@ def logout():
     return redirect(url_for('index'))
 
 
+# <-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------> #
+
+
 # BOOKS VIEWS
+@app.route('/dashboards/user_dashboard')
+def user_dashboard():
+    return render_template('dashboards/user_dashboard.html')
+
+
 @app.route('/books', methods=['GET'])
 def list_all_books():
     books = Book.query.order_by('name').all()
@@ -103,7 +117,7 @@ def list_books_by_filter(filter: str):
         return render_template('404_template.html', error='Invalid Filter')
 
     return render_template(
-        'books/books.html', books=books, section=section, author=author
+        'books/books_filter.html', books=books, section=section, author=author
     )
 
 
@@ -124,8 +138,7 @@ def view_borrowed_books():
     return render_template('users/my_books.html', borrowed_books=borrowed_books)
 
 
-@app.route('/books/request/<int:book_id>', methods=['POST'])
-@login_required  # Assuming you have a decorator to check if a user is logged in
+@app.route('/books/request/<int:book_id>', methods=['POST', 'GET'])
 def request_book(book_id):
     user_id = session.get('user_id')  # Assuming `current_user` keeps track of the logged-in user
 
@@ -145,9 +158,9 @@ def request_book(book_id):
     new_request = UserBook(user_id=user_id, book_id=book_id)
     db.session.add(new_request)
     db.session.commit()
-
+ 
     flash('Book request submitted successfully!', 'success')
-    return redirect(url_for('list_all_books'))
+    return render_template_string('<h1> Request Submission Successful!<h1>')
 
 
 @app.route('/books/return/<int:user_book_id>', methods=['POST'])
@@ -167,6 +180,121 @@ def return_book(user_book_id):
 
     return redirect(url_for('view_borrowed_books'))
 
+
+@app.route('/books/deadlines')
+def view_borrowed_books_with_deadlines():
+    user_id = session.get('user_id')
+    if not user_id:
+        flash('Please login to view your books and deadlines', 'error')
+        return redirect(url_for('login'))
+
+    borrowed_books = db.session.query(UserBook, Book).join(Book, UserBook.book_id == Book.id).filter(UserBook.user_id == user_id, UserBook.t_return == None).all()
+
+    books_with_deadlines = []
+    for user_book, book in borrowed_books:
+        # Calculate the deadline (14 days after the request by default)
+        default_deadline = user_book.t_request + datetime.timedelta(days=14)
+        deadline = user_book.due_date if user_book.due_date else default_deadline
+        days_until_deadline = (deadline - datetime.utcnow()).days
+        books_with_deadlines.append({
+            'book': book,
+            'deadline': deadline,
+            'days_until_deadline': days_until_deadline
+        })
+
+    return render_template('users/books_with_deadlines.html', books_with_deadlines=books_with_deadlines)
+
+
+@app.route('/requested_books')
+def requested_books():
+    user_id = session.get('user_id')
+    if not user_id:
+        flash('Please log in to view requested books.', 'error')
+        return redirect(url_for('login'))
+
+    # Query for books that the current user has requested and are awaiting approval
+    requested_books = db.session.query(UserBook, Book).join(Book, UserBook.book_id == Book.id)\
+                      .filter(UserBook.user_id == user_id, UserBook.is_approved == False, UserBook.is_rejected == False).all()
+
+    return render_template('users/requested_books.html', requested_books=requested_books)
+
+
+@app.route('/books/finished')
+def view_finished_books():
+    user_id = session.get('user_id')
+    if not user_id:
+        flash('Please login to view your finished books', 'error')
+        return redirect(url_for('login'))
+
+    finished_books = db.session.query(UserBook, Book).join(Book, UserBook.book_id == Book.id).filter(UserBook.user_id == user_id, UserBook.t_return != None).all()
+
+    return render_template('users/finished_books.html', finished_books=finished_books)
+
+
+@app.route('/books/finished/by-section')
+def view_finished_books_by_section():
+    user_id = session.get('user_id')
+    if not user_id:
+        flash('Please login to view your finished books by section', 'error')
+        return redirect(url_for('login'))
+
+    finished_books = db.session.query(UserBook, Book, Section).join(Book, UserBook.book_id == Book.id).join(Section, Book.section_id == Section.id).filter(UserBook.user_id == user_id, UserBook.t_return != None).all()
+    
+    # Organizing books by their sections
+    books_by_section = {}
+    for user_book, book, section in finished_books:
+        if section.name not in books_by_section:
+            books_by_section[section.name] = []
+        books_by_section[section.name].append({'book': book, 'user_book': user_book})
+
+    return render_template('users/finished_books_by_section.html', books_by_section=books_by_section)
+
+
+@app.route('/user/stats')
+def user_stats():
+    user_id = session.get('user_id')
+    if not user_id:
+        flash('Please login', 'error')
+        return redirect(url_for('login'))  # Assuming there's a 'login' view to redirect to
+
+    user_books = UserBook.query.filter(UserBook.user_id == user_id, UserBook.t_return != None).all()
+    if not user_books:
+        # If no books have been finished, return a message indicating no data is available
+        return render_template_string("<h1>No User Data Available!</h1>")
+
+    books = [Book.query.get(ub.book_id) for ub in user_books if ub.t_return is not None]
+
+    # Prepare data for graphs
+    if books:
+        df = pd.DataFrame([{'section': book.section.name, 'return_month': ub.t_return.month} for ub, book in zip(user_books, books) if ub.t_return is not None])
+        if not df.empty:
+            month_counts = df['return_month'].value_counts().sort_index()
+            section_counts = df['section'].value_counts()
+
+            # Plotting
+            fig, axs = plt.subplots(2, 1, figsize=(10, 10))
+
+            # Monthly frequency
+            axs[0].bar(month_counts.index, month_counts.values, color='skyblue')
+            axs[0].set_title('Monthly Book Reading Frequency')
+            axs[0].set_xlabel('Month')
+            axs[0].set_ylabel('Books Read')
+
+            # Section interest
+            axs[1].pie(section_counts, labels=section_counts.index, autopct='%1.1f%%')
+            axs[1].set_title('Interest in Sections')
+
+            # Save plot to a bytes buffer
+            buf = BytesIO()
+            plt.savefig(buf, format='png')
+            buf.seek(0)
+
+            return send_file(buf, mimetype='image/png')
+    # If the DataFrame is empty (i.e., no books or no returned books), show a message
+    return render_template_string("<h1>No User Data Available!</h1>")
+
+
+# <-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------> #
 
 
 # LIBRARIAN VIEWS
