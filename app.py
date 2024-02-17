@@ -6,7 +6,8 @@ from nit import app, db
 from flask import render_template, render_template_string, request, redirect, send_file, url_for, session, flash
 from models import User, Section, Book, UserBook
 from sqlalchemy.orm.exc import NoResultFound
-
+from flask import request, jsonify
+from sqlalchemy import or_
 
 # DECORATORS
 from flask import redirect, url_for, session
@@ -105,19 +106,27 @@ def list_all_books():
 
 
 @app.route('/books/filter', methods=['GET'])
-def list_books_by_filter():
-    filter_type = request.args.get('filter_type')
+def filter_books():
+    filter_type = request.args.get('filter_type', 'all')
     query = request.args.get('query', '')
+
+    sections = Section.query.all()
 
     if filter_type == 'section':
         section_id = request.args.get('section_id')
-        books = Book.query.filter(Book.section_id == section_id, Book.name.ilike(f"%{query}%")).all()
+        books = Book.query.filter(Book.section_id == section_id).all()
     elif filter_type == 'author':
-        books = Book.query.filter(Book.author.ilike(f"%{query}%"), Book.name.ilike(f"%{query}%")).all()
+        books = Book.query.filter(Book.author.ilike(f"%{query}%")).all()
     else:
-        books = Book.query.filter(Book.name.ilike(f"%{query}%")).all()
+        books = Book.query.filter(or_(Book.name.ilike(f"%{query}%"), Book.author.ilike(f"%{query}%"))).all()
 
-    return render_template('books/books_filter.html', books=books)
+    return render_template('books/books_filter.html', books=books, sections=sections, filter_type=filter_type, query=query)
+
+
+
+
+
+
 
 
 @app.route('/books/view/<book_id>', methods=['GET'])
