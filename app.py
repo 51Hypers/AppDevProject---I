@@ -190,24 +190,6 @@ def request_book(book_id):
     return render_template_string('<h1> Request Submission Successful!<h1>')
 
 
-# @app.route('/books/return/<int:user_book_id>', methods=['POST'])
-# @login_required
-# def return_book(user_book_id):
-#     user_book = UserBook.query.filter_by(id=user_book_id, user_id=session.get('user_id')).first()
-#     if not user_book:
-#         flash('Book return request is invalid.', 'error')
-#         return redirect(url_for('view_borrowed_books'))
-
-#     if user_book.is_returned():
-#         flash('This book has already been returned.', 'error')
-#     else:
-#         user_book.t_return = datetime.utcnow()
-#         db.session.commit()
-#         flash('Book returned successfully!', 'success')
-
-#     return redirect(url_for('view_borrowed_books'))
-
-
 @app.route('/books/deadlines')
 def view_borrowed_books_with_deadlines():
     user_id = session.get('user_id')
