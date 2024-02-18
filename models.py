@@ -16,7 +16,7 @@ class User(db.Model):
     is_librarian = Column(Boolean, default=False)
     is_admin = Column(Boolean, default=False)
 
-    books = Relationship('UserBook', backref='user', lazy=True)
+    user_books = db.relationship('UserBook', back_populates='user', lazy=True)
 
     def __init__(
             self, id: str = None, username: str = None, password: str = None, email: str = None, t_register: datetime = None, is_librarian: bool = None, is_admin: bool = None
@@ -54,6 +54,8 @@ class Book(db.Model):
         self.content = content
         self.author = author
         self.section_id = section_id
+
+    user_books = db.relationship('UserBook', back_populates='book', lazy=True)
 
 
 class Section(db.Model):
@@ -103,3 +105,6 @@ class UserBook(db.Model):
     def reject_book_request(self):
         self.is_rejected = True
         db.session.commit()
+    
+    user = db.relationship('User', back_populates='user_books')
+    book = db.relationship('Book', back_populates='user_books')

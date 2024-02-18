@@ -13,6 +13,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from flask import redirect, url_for, session
 from functools import wraps
 
+
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -31,7 +32,6 @@ def login_required(f):
 def index():
     return render_template('home_page/index.html')
 
-from flask import session  # Import session
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -351,7 +351,7 @@ def approve_book_request(action: str):
         userbook.approve_book_request()
     else:
         userbook.reject_book_request()
-    return redirect(url_for('requests'))
+    return redirect(url_for('list_all_requests'))
 
 @app.route('/add-book', methods=['GET', 'POST'])
 def add_book():
@@ -394,12 +394,14 @@ def list_all_users_for_admin():
         users_query = users_query.filter(User.is_librarian == False)
     return render_template('admin/all_users.html', users=users_query.all())
 
+
 @app.route('/admin/grant_librarian', methods=['POST'])
 def make_librarian_grant():
     user_id = request.form['user_id']
     user: User = db.session.query(User).filter(User.id == user_id).one()
     user.grant_librarian_access()
     return redirect(url_for('admin/users'))
+
 
 @app.route('/admin/revoke_librarian', methods=['POST'])
 def make_librarian_revoke():
