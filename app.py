@@ -7,6 +7,7 @@ from nit import app, db
 from flask import render_template, render_template_string, request, redirect, send_file, url_for, session, flash
 from models import User, Section, Book, UserBook
 from sqlalchemy.orm.exc import NoResultFound
+from datetime import datetime, timedelta
 
 
 # DECORATORS
@@ -92,7 +93,31 @@ def logout():
 # BOOKS VIEWS
 @app.route('/dashboards/user_dashboard')
 def user_dashboard():
-    return render_template('dashboards/user_dashboard.html')
+    user_id = session.get('user_id')
+    if not user_id:
+        flash('Please login to view your dashboard.', 'error')
+        return redirect(url_for('login'))
+
+    borrowed_books = db.session.query(UserBook, Book).join(Book, UserBook.book_id == Book.id).filter(UserBook.user_id == user_id, UserBook.t_return == None, UserBook.is_approved == True).all()
+    now = datetime.utcnow()
+    books_revoked = False
+    deadline_warning_issued = False
+
+    for user_book, book in borrowed_books:
+        if user_book.t_deadline and now > user_book.t_deadline:
+            user_book.is_approved = False
+            books_revoked = True
+        elif user_book.t_deadline and user_book.t_deadline - now <= timedelta(days=1):
+            deadline_warning_issued = True
+
+    if books_revoked:
+        db.session.commit()
+        flash('Access to one or more overdue books has been revoked. Please return them as soon as possible.', 'warning')
+    
+    if deadline_warning_issued:
+        flash('Warning: One or more of your borrowed books are due within the next day. Please return them on time to avoid losing access.', 'warning')
+
+    return render_template('dashboards/user_dashboard.html', borrowed_books=borrowed_books)
 
 
 @app.route('/books', methods=['GET'])
@@ -165,22 +190,22 @@ def request_book(book_id):
     return render_template_string('<h1> Request Submission Successful!<h1>')
 
 
-@app.route('/books/return/<int:user_book_id>', methods=['POST'])
-@login_required
-def return_book(user_book_id):
-    user_book = UserBook.query.filter_by(id=user_book_id, user_id=session.get('user_id')).first()
-    if not user_book:
-        flash('Book return request is invalid.', 'error')
-        return redirect(url_for('view_borrowed_books'))
+# @app.route('/books/return/<int:user_book_id>', methods=['POST'])
+# @login_required
+# def return_book(user_book_id):
+#     user_book = UserBook.query.filter_by(id=user_book_id, user_id=session.get('user_id')).first()
+#     if not user_book:
+#         flash('Book return request is invalid.', 'error')
+#         return redirect(url_for('view_borrowed_books'))
 
-    if user_book.is_returned():
-        flash('This book has already been returned.', 'error')
-    else:
-        user_book.t_return = datetime.utcnow()
-        db.session.commit()
-        flash('Book returned successfully!', 'success')
+#     if user_book.is_returned():
+#         flash('This book has already been returned.', 'error')
+#     else:
+#         user_book.t_return = datetime.utcnow()
+#         db.session.commit()
+#         flash('Book returned successfully!', 'success')
 
-    return redirect(url_for('view_borrowed_books'))
+#     return redirect(url_for('view_borrowed_books'))
 
 
 @app.route('/books/deadlines')
@@ -190,17 +215,26 @@ def view_borrowed_books_with_deadlines():
         flash('Please login to view your books and deadlines', 'error')
         return redirect(url_for('login'))
 
-    borrowed_books = db.session.query(UserBook, Book).join(Book, UserBook.book_id == Book.id).filter(UserBook.user_id == user_id, UserBook.t_return == None).all()
+    borrowed_books = db.session.query(UserBook, Book) \
+        .join(Book, UserBook.book_id == Book.id) \
+        .filter(UserBook.user_id == user_id, UserBook.is_approved == True, UserBook.t_return == None) \
+        .order_by(UserBook.t_deadline.asc()) \
+        .all()
 
     books_with_deadlines = []
     for user_book, book in borrowed_books:
-        # Calculate the deadline (14 days after the request by default)
-        default_deadline = user_book.t_request + datetime.timedelta(days=14)
-        deadline = user_book.due_date if user_book.due_date else default_deadline
-        days_until_deadline = (deadline - datetime.utcnow()).days
+        # Ensure that there is a deadline date before attempting subtraction
+        if user_book.t_deadline:
+            days_until_deadline = (user_book.t_deadline - datetime.utcnow()).days
+        else:
+            # Handle case where t_deadline is None; you might set a default or skip
+            # For example, using a default deadline of 14 days from now
+            default_deadline = datetime.utcnow() + timedelta(days=14)
+            days_until_deadline = (default_deadline - datetime.utcnow()).days
+
         books_with_deadlines.append({
             'book': book,
-            'deadline': deadline,
+            'deadline': user_book.t_deadline or default_deadline,  # Use t_deadline if available, otherwise default
             'days_until_deadline': days_until_deadline
         })
 
@@ -296,13 +330,53 @@ def user_stats():
     return render_template_string("<h1>No User Data Available!</h1>")
 
 
+@app.route('/books/return/<int:userbook_id>', methods=['POST'])
+def return_book(userbook_id):
+    userbook = db.session.query(UserBook).filter_by(id=userbook_id).first()
+    if userbook:
+        # Book is being returned now
+        userbook.t_return = datetime.utcnow()
+        
+        # Check if the book is returned after the deadline
+        if datetime.utcnow() > userbook.t_deadline:
+            # Setting is_approved to False to indicate revoking borrowing privileges due to late return
+            userbook.is_approved = False
+            flash('Returned late. Borrowing privileges have been revoked.', 'error')
+        else:
+            flash('Book returned successfully.', 'success')
+        db.session.commit()
+    else:
+        flash('Book return failed. Invalid request.', 'error')
+    
+    return redirect(url_for('view_borrowed_books_with_deadlines'))
+
+
 # <-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------> #
 
 
 # LIBRARIAN VIEWS
 @app.route('/dashboards/librarian_dashboard')
 def librarian_dashboard():
-    return render_template('dashboards/librarian_dashboard.html')
+    borrowed_books = db.session.query(UserBook, Book, User).join(Book, UserBook.book_id == Book.id).join(User, UserBook.user_id == User.id).filter(UserBook.t_return == None, UserBook.is_approved == True, User.is_librarian == False, User.is_admin == False).all()
+    now = datetime.utcnow()
+    books_revoked = False
+    deadline_warning_issued = False
+
+    for user_book, book, user in borrowed_books:
+        if user_book.t_deadline and now > user_book.t_deadline:
+            user_book.is_approved = False
+            books_revoked = True
+        elif user_book.t_deadline and user_book.t_deadline - now <= timedelta(days=1):
+            deadline_warning_issued = True
+
+    if books_revoked:
+        db.session.commit()
+        flash('Access has been revoked for overdue books borrowed by users. Please ensure they are returned.', 'warning')
+    
+    if deadline_warning_issued:
+        flash('Warning: Some users have borrowed books that are due within the next day. Please remind them to return on time.', 'warning')
+
+    return render_template('dashboards/librarian_dashboard.html', borrowed_books=borrowed_books)
 
 
 @app.route('/user', methods=['GET'])
@@ -384,6 +458,9 @@ def add_section():
 
         section: Section = db.session.query(Section).filter_by(Section.name == request.form['name'])
         return redirect(url_for(f'books/section?section_id={section.id}'))
+
+
+# <-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------> #
 
 
 # ADMIN VIEWS

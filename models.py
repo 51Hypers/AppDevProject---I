@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer, String,
                         Text)
@@ -81,6 +81,7 @@ class UserBook(db.Model):
     book_id = Column(Integer, ForeignKey('book.id'), nullable=False)
     t_request = Column(DateTime, default=datetime.utcnow, nullable=False)
     t_return = Column(DateTime, nullable=True)
+    t_deadline = Column(DateTime, nullable=True)
     is_approved = Column(Boolean, default=False)
     is_rejected = Column(Boolean, default=False)
     
@@ -104,6 +105,11 @@ class UserBook(db.Model):
     
     def reject_book_request(self):
         self.is_rejected = True
+        db.session.commit()
+    
+    def approve_book_request(self):
+        self.is_approved = True
+        self.t_deadline = datetime.utcnow() + timedelta(days=14)
         db.session.commit()
     
     user = db.relationship('User', back_populates='user_books')
