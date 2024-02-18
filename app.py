@@ -2,6 +2,7 @@ import datetime
 from io import BytesIO
 import pandas as pd
 from matplotlib import pyplot as plt
+from sqlalchemy import Null
 from nit import app, db
 from flask import render_template, render_template_string, request, redirect, send_file, url_for, session, flash
 from models import User, Section, Book, UserBook
@@ -297,28 +298,37 @@ def user_stats():
 
 
 # LIBRARIAN VIEWS
+@app.route('/dashboards/librarian_dashboard')
+def librarian_dashboard():
+    return render_template('dashboards/librarian_dashboard.html')
+
+
 @app.route('/user', methods=['GET'])
 def list_all_users():
     users = db.session.query(User).filter(User.is_librarian == False).filter(User.is_admin == False).all()
     return render_template('librarian/all_users.html', users=users)
 
-@app.route('/users/<user_id>', methods=['GET'])
-def view_user_detail(user_id: int):
-    user = db.session.query(User).filter(User.id == user_id).one()
-    unapproved_requests = db.session.query(UserBook).join(Book, Book.id == UserBook.book_id).filter(UserBook.user_id == user_id).filter(UserBook.is_approved == False).all()
-    rejected_requests = db.session.query(UserBook).join(Book, Book.id == UserBook.book_id).filter(UserBook.user_id == user_id).filter(UserBook.is_rejected == True).all()
-    returned_user_books = db.session.query(UserBook).join(Book, Book.id == UserBook.book_id).filter(UserBook.user_id == user_id).filter(UserBook.t_return is not None).all()
-    unreturned_user_books = db.session.query(UserBook).join(Book, Book.id == UserBook.book_id).filter(UserBook.user_id == user_id).filter(UserBook.is_approved == True).filter(UserBook.t_return is None).all()
 
-    return render_template(
-        'librarian/user_detail.html', user=user, unapproved_requests=unapproved_requests, 
-        returned_user_books=returned_user_books, unreturned_user_books=unreturned_user_books, rejected_requests=rejected_requests
-    )
+@app.route('/users/details', methods=['GET'])
+def view_users_details():
+    users = User.query.filter(User.is_librarian == False, User.is_admin == False).all()
+    if not users:
+        return render_template('librarian/user_details.html', message="There are no active users registered.")
+
+    for user in users:
+        user.unapproved_requests = UserBook.query.filter_by(user_id=user.id, is_approved=False, is_rejected=False).all()
+        user.approved_requests = UserBook.query.filter_by(user_id=user.id, is_approved=True).all()
+        user.rejected_requests = UserBook.query.filter_by(user_id=user.id, is_rejected=True).all()
+        user.returned_books = UserBook.query.filter(UserBook.user_id == user.id, UserBook.t_return.isnot(None)).all()
+        user.unreturned_books = UserBook.query.filter_by(user_id=user.id, is_approved=True, t_return=None).all()
+
+    return render_template('librarian/user_details.html', users=users)
+
 
 @app.route('/requests', methods=['GET'])
 def list_all_requests():
-    unapproved_requests = db.session.query(UserBook).join(Book, Book.id == UserBook.user_id).join(User, User.id == UserBook.user_id).filter(UserBook.is_approved == False).filter(UserBook.is_rejected == False).all()
-    rejected_requests = db.session.query(UserBook).join(Book, Book.id == UserBook.user_id).join(User, User.id == UserBook.user_id).filter(UserBook.is_rejected == False).all()
+    unapproved_requests = db.session.query(UserBook).join(Book, Book.id == UserBook.book_id).join(User, User.id == UserBook.user_id).filter(UserBook.is_approved == False, UserBook.is_rejected == False).all()
+    rejected_requests = db.session.query(UserBook).join(Book, Book.id == UserBook.book_id).join(User, User.id == UserBook.user_id).filter(UserBook.is_rejected == True).all()
     return render_template('librarian/requests.html', unapproved_requests=unapproved_requests, rejected_requests=rejected_requests)
 
 @app.route('/stats')

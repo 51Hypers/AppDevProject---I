@@ -1,0 +1,55 @@
+<!-- templates/librarian/book_stats.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Book Statistics</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Ensure the path to your CSS file is correct -->
+</head>
+<body>
+    <h1>Statistics</h1>
+
+    {% if request.args.get('books') %}
+        <h2>Books Statistics</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Book Title</th>
+                    <th>Total Requests</th>
+                    <!-- Add more headers as needed -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for ub in userbooks %}
+                    <tr>
+                        <td>{{ ub.book.title }}</td>
+                        <td>{{ ub.book.userbooks.count() }}</td>
+                        <!-- Add more details as needed -->
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% elif request.args.get('users') %}
+        <h2>User Statistics</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Total Book Requests</th>
+                    <!-- Add more headers as needed -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for ub in userbooks %}
+                    <tr>
+                        <td>{{ ub.user.username }}</td>
+                        <td>{{ ub.user.userbooks.count() }}</td>
+                        <!-- Add more details as needed -->
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</body>
+</html>
