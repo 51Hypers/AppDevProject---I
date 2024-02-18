@@ -1,0 +1,49 @@
+<!-- Assuming the template is at 'templates/librarian/user_details.html' -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Details</title>
+</head>
+<body>
+    <h1>User Details</h1>
+    {% for user in users %}
+        <h2>{{ user.username }}</h2>
+        <p>Registered on: {{ user.t_register.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+        <h3>Unapproved Requests</h3>
+        {% for request in user.unapproved_requests %}
+            <p>Book ID: {{ request.book_id }}, Requested On: {{ request.t_request }}</p>
+        {% else %}
+            <p>No unapproved requests.</p>
+        {% endfor %}
+
+        <h3>Approved Requests</h3>
+        {% for request in user.approved_requests %}
+            <p>Book ID: {{ request.book_id }}, Approved, Return by: {{ request.t_return }}</p>
+        {% else %}
+            <p>No approved requests.</p>
+        {% endfor %}
+
+        <h3>Rejected Requests</h3>
+        {% for request in user.rejected_requests %}
+            <p>Book ID: {{ request.book_id }}, Rejected</p>
+        {% else %}
+            <p>No rejected requests.</p>
+        {% endfor %}
+
+        <h3>Returned Books</h3>
+        {% for request in user.returned_books %}
+            <p>Book ID: {{ request.book_id }}, Returned On: {{ request.t_return }}</p>
+        {% else %}
+            <p>No books returned yet.</p>
+        {% endfor %}
+
+        <h3>Unreturned Books</h3>
+        {% for request in user.unreturned_books %}
+            <p>Book ID: {{ request.book_id }}, To be returned</p>
+        {% else %}
+            <p>All books returned.</p>
+        {% endfor %}
+    {% endfor %}
+</body>
+</html>

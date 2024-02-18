@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Book Requests</title>
+    <!-- Add any additional CSS or JS you need here -->
+</head>
+<body>
+    <h1>Book Requests</h1>
+    <section>
+        <h2>Unapproved Requests</h2>
+        {% if unapproved_requests %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Book</th>
+                        <th>Request Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for request in unapproved_requests %}
+                        <tr>
+                            <td>{{ request.user.username }}</td>
+                            <td>{{ request.book.name }}</td>
+                            <td>{{ request.t_request.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            <td>
+                                <form action="{{ url_for('approve_book_request', action='approve') }}" method="post">
+                                    <input type="hidden" name="userbook_id" value="{{ request.id }}">
+                                    <input type="submit" value="Approve">
+                                </form>
+                                <form action="{{ url_for('approve_book_request', action='reject') }}" method="post">
+                                    <input type="hidden" name="userbook_id" value="{{ request.id }}">
+                                    <input type="submit" value="Reject">
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No unapproved requests at this time.</p>
+        {% endif %}
+    </section>
+
+    <section>
+        <h2>Rejected Requests</h2>
+        {% if rejected_requests %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Book</th>
+                        <th>Request Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for request in rejected_requests %}
+                        <tr>
+                            <td>{{ request.user.username }}</td>
+                            <td>{{ request.book.name }}</td>
+                            <td>{{ request.t_request.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No rejected requests.</p>
+        {% endif %}
+    </section>
+</body>
+</html>

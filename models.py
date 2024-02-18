@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer, String,
                         Text)
@@ -16,7 +16,7 @@ class User(db.Model):
     is_librarian = Column(Boolean, default=False)
     is_admin = Column(Boolean, default=False)
 
-    books = Relationship('UserBook', backref='user', lazy=True)
+    user_books = db.relationship('UserBook', back_populates='user', lazy=True)
 
     def __init__(
             self, id: str = None, username: str = None, password: str = None, email: str = None, t_register: datetime = None, is_librarian: bool = None, is_admin: bool = None
@@ -36,7 +36,17 @@ class User(db.Model):
     def revoke_librarian_access(self):
         self.is_librarian = False
         db.session.commit()
+class LibrarianRequest(db.Model):
+    __tablename__ = "librarian_request"
+    id = Column(Integer, primary_key=True)
+    username = Column(String(50), unique=True, nullable=False)
+    email = Column(String(100), unique=True, nullable=False)
+    password = Column(String(50), nullable=False)
 
+    def __init__(self, username, email, password):
+        self.username = username
+        self.email = email
+        self.password = password
 
 class Book(db.Model):
     __table_name__ = "book"
@@ -54,6 +64,8 @@ class Book(db.Model):
         self.content = content
         self.author = author
         self.section_id = section_id
+
+    user_books = db.relationship('UserBook', back_populates='book', lazy=True)
 
 
 class Section(db.Model):
@@ -79,6 +91,7 @@ class UserBook(db.Model):
     book_id = Column(Integer, ForeignKey('book.id'), nullable=False)
     t_request = Column(DateTime, default=datetime.utcnow, nullable=False)
     t_return = Column(DateTime, nullable=True)
+    t_deadline = Column(DateTime, nullable=True)
     is_approved = Column(Boolean, default=False)
     is_rejected = Column(Boolean, default=False)
     
@@ -103,3 +116,11 @@ class UserBook(db.Model):
     def reject_book_request(self):
         self.is_rejected = True
         db.session.commit()
+    
+    def approve_book_request(self):
+        self.is_approved = True
+        self.t_deadline = datetime.utcnow() + timedelta(days=14)
+        db.session.commit()
+    
+    user = db.relationship('User', back_populates='user_books')
+    book = db.relationship('Book', back_populates='user_books')

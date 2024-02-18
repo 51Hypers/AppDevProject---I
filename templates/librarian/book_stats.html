@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Book Statistics</title>
+    <!-- Add any necessary CSS or meta tags here -->
+  </head>
+  <body>
+    <h1>Book Statistics</h1>
+
+    <h2>Requested Books:</h2>
+    <ul>
+      {% for userbook in requested_books %} {% set book =
+      Book.query.get(userbook.book_id) %}
+      <li>
+        <strong>User:</strong> {{ userbook.user.username }},
+        <strong>Book:</strong> {{ book.name }}
+      </li>
+      {% endfor %}
+    </ul>
+
+    <h2>Borrowed Books:</h2>
+    <ul>
+      {% for userbook in borrowed_books %} {% set book =
+      Book.query.get(userbook.book_id) %}
+      <li>
+        <strong>User:</strong> {{ userbook.user.username }},
+        <strong>Book:</strong> {{ book.name }}, <strong>Deadline:</strong> {{
+        userbook.t_return.strftime('%Y-%m-%d') if userbook.t_return else 'None'
+        }}
+      </li>
+      {% endfor %}
+    </ul>
+
+    <h2>All Books:</h2>
+    <ul>
+      {% for book in all_books %}
+      <li>{{ book.name }}</li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>
