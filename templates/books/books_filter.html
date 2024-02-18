@@ -2,55 +2,77 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Filter Books</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Filtered Books</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
 </head>
 <body>
-<div class="container mt-3">
-    <h2>Filter Books</h2>
-    <div class="row">
-        <div class="col-md-4">
-            <form action="/books/section" method="get">
-                <div class="form-group">
-                    <label for="sectionSelect">Filter by Section</label>
-                    <select class="form-control" id="sectionSelect" name="section_id" onchange="this.form.submit()">
-                        <option value="">Select a Section</option>
-                        {% for section in sections %}
-                        <option value="{{ section.id }}">{{ section.name }}</option>
-                        {% endfor %}
-                    </select>
+    <div class="container">
+        <h1 class="center-align">Filtered Books</h1>
+        <form action="/books/filter" method="GET">
+            <div class="input-field">
+                <select name="filter_type" id="filter_type">
+                    <option value="all" {% if filter_type == 'all' %}selected{% endif %}>All</option>
+                    <option value="section" {% if filter_type == 'section' %}selected{% endif %}>Section</option>
+                    <option value="author" {% if filter_type == 'author' %}selected{% endif %}>Author</option>
+                </select>
+                <label for="filter_type">Filter Type</label>
+            </div>
+            <div class="input-field" id="section_dropdown" style="display: {% if filter_type == 'section' %}block{% else %}none{% endif %};">
+                <select name="section_id" id="section_id">
+                    <option value="" disabled selected>Select a Section</option>
+                    {% for section in sections %}
+                    <option value="{{ section.id }}" {% if filter_type == 'section' and section.id == query %}selected{% endif %}>{{ section.name }}</option>
+                    {% endfor %}
+                </select>
+                <label for="section_id">Select Section</label>
+            </div>
+            <div class="input-field" id="query_input" style="display: {% if filter_type != 'section' %}block{% else %}none{% endif %};">
+                <input type="text" name="query" id="query" value="{{ query }}">
+                <label for="query">Filter Query</label>
+            </div>
+            <button class="btn waves-effect waves-light" type="submit">Filter</button>
+        </form>
+        
+        <div class="row">
+            {% for book in books %}
+            <div class="col s12 m6 l4">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title">{{ book.name }}</span>
+                        <p>Author: {{ book.author }}</p>
+                        <p>Section ID: {{ book.section_id }}</p>
+                    </div>
+                    <div class="card-action">
+                        <a href="{{ url_for('request_book', book_id=book.id) }}" class="btn waves-effect waves-light">Request</a>
+                    </div>
                 </div>
-            </form>
-        </div>
-        <div class="col-md-4">
-            <form action="/books/author" method="get">
-                <div class="form-group">
-                    <label for="authorInput">Filter by Author</label>
-                    <input type="text" class="form-control" id="authorInput" name="author" placeholder="Author Name">
-                </div>
-                <button type="submit" class="btn btn-primary">Filter</button>
-            </form>
+            </div>
+            {% endfor %}
         </div>
     </div>
-    <div class="row">
-        <div class="col">
-            <h3>Books</h3>
-            <ul class="list-group">
-                {% for book in books %}
-                <li class="list-group-item">
-                    {{ book.name }} by {{ book.author }}
-                    <!-- Add your book request button or link here if needed -->
-                </li>
-                {% else %}
-                <li class="list-group-item">No books found.</li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-</div>
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var elems = document.querySelectorAll('select');
+            var instances = M.FormSelect.init(elems);
+
+            var filterTypeSelect = document.getElementById('filter_type');
+            var sectionDropdown = document.getElementById('section_dropdown');
+            var queryInput = document.getElementById('query_input');
+
+            filterTypeSelect.addEventListener('change', function() {
+                if (filterTypeSelect.value === 'section') {
+                    sectionDropdown.style.display = 'block';
+                    queryInput.style.display = 'none';
+                } else {
+                    sectionDropdown.style.display = 'none';
+                    queryInput.style.display = 'block';
+                }
+            });
+        });
+    </script>
 </body>
 </html>
