@@ -211,6 +211,7 @@ def view_borrowed_books():
 @app.route('/books/request/<int:book_id>', methods=['POST', 'GET'])
 def request_book(book_id):
     user_id = session.get('user_id')  # Assuming `current_user` keeps track of the logged-in user
+    current_data = datetime.utcnow()
 
     # Check if the user has already requested the maximum number of books
     active_requests = UserBook.query.filter_by(user_id=user_id, is_returned=False).count()
@@ -275,7 +276,7 @@ def requested_books():
 
     # Query for books that the current user has requested and are awaiting approval
     requested_books = db.session.query(UserBook, Book).join(Book)\
-                  .filter(UserBook.user_id == user_id, UserBook.is_approved == False, UserBook.is_rejected == False).all()
+                  .filter(UserBook.user_id == user_id, UserBook.is_approved == False, UserBook.is_rejected == False, UserBook.t_return == None, UserBook.t_deadline == None).all()
     print(requested_books)
 
     return render_template('users/requested_books.html', requested_books=requested_books)
@@ -362,7 +363,8 @@ def return_book(userbook_id):
     if userbook:
         # Book is being returned now
         userbook.t_return = datetime.utcnow()
-        
+        userbook.t_deadline = datetime.utcnow() + timedelta(days=14)
+
         # Check if the book is returned after the deadline
         if datetime.utcnow() > userbook.t_deadline:
             # Setting is_approved to 0 to indicate revoking borrowing privileges due to late return
@@ -485,11 +487,12 @@ def view_users_details():
         return render_template('librarian/user_details.html', message="There are no active users registered.")
 
     for user in users:
-        user.unapproved_requests = UserBook.query.filter_by(user_id=user.id, is_approved=False, is_rejected=False).all()
+        user.unapproved_requests = UserBook.query.filter_by(user_id=user.id, is_approved=False, is_rejected=False, t_return=None, t_deadline=None).all()
         user.approved_requests = UserBook.query.filter_by(user_id=user.id, is_approved=True).all()
         user.rejected_requests = UserBook.query.filter_by(user_id=user.id, is_rejected=True).all()
         user.returned_books = UserBook.query.filter(UserBook.user_id == user.id, UserBook.t_return.isnot(None)).all()
         user.unreturned_books = UserBook.query.filter_by(user_id=user.id, is_approved=True, t_return=None).all()
+        user.book_details = [{'id': request.book_id, 'name': request.book.name} for request in user.unapproved_requests + user.approved_requests + user.rejected_requests + user.returned_books + user.unreturned_books]
 
     return render_template('librarian/user_details.html', users=users)
 
@@ -503,8 +506,8 @@ def list_all_requests():
 
 @app.route('/stats')
 def get_books_stats():
-    requested_books = UserBook.query.filter_by(is_approved=False, is_rejected=False).all()
-    borrowed_books = UserBook.query.filter_by(is_approved=True, is_returned=False).all()
+    requested_books = UserBook.query.filter_by(is_approved=False, is_rejected=False, t_return=None, t_deadline=None).all()
+    borrowed_books = UserBook.query.filter(is_approved=True, is_rejected=False).all()
     all_books = Book.query.all()
 
     return render_template('librarian/book_stats.html', requested_books=requested_books, borrowed_books=borrowed_books, all_books=all_books, Book=Book)

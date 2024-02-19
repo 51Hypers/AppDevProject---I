@@ -25,7 +25,7 @@
       <li>
         <strong>User:</strong> {{ userbook.user.username }},
         <strong>Book:</strong> {{ book.name }}, <strong>Deadline:</strong> {{
-        userbook.t_return.strftime('%Y-%m-%d') if userbook.t_return else 'None'
+        userbook.t_deadline.strftime('%Y-%m-%d') if userbook.t_deadline else 'None'
         }}
       </li>
       {% endfor %}

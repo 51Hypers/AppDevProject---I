@@ -36,6 +36,7 @@ class User(db.Model):
     def revoke_librarian_access(self):
         self.is_librarian = False
         db.session.commit()
+        
 class LibrarianRequest(db.Model):
     __tablename__ = "librarian_request"
     id = Column(Integer, primary_key=True)
