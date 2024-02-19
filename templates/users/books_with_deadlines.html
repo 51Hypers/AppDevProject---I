@@ -2,30 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Book Deadlines</title>
+    <title>Books with Deadlines</title>
 </head>
 <body>
-    <h1><a href="{{ url_for('view_borrowed_books_with_deadlines') }}">Deadlines</a></h1>
+    <h1>Books with Deadlines</h1>
     {% if books_with_deadlines %}
         <ul>
             {% for item in books_with_deadlines %}
                 <li>
-                    <strong>{{ item.book.name }}</strong> - Deadline: {{ item.deadline.strftime('%Y-%m-%d') }} ({{ item.days_until_deadline }} days left)
+                    <strong>{{ item.book_name }}</strong> - Deadline: {{ item.deadline }} ({{ item.days_until_deadline }} days left)
+                    <form action="{{ url_for('return_book', userbook_id=item.user_book_id) }}" method="post">
+                        <button type="submit">Return</button>
+                    </form>
                 </li>
             {% endfor %}
         </ul>
     {% else %}
         <p>No borrowed books or deadlines to display.</p>
     {% endif %}
-    {% for book_with_deadline in books_with_deadlines %}
-        <div>
-            <p>Book: {{ book_with_deadline.book.name }}</p>
-            <p>Deadline: {{ book_with_deadline.deadline.strftime('%Y-%m-%d') }}</p>
-            <p>Days until deadline: {{ book_with_deadline.days_until_deadline }}</p>
-            <form action="{{ url_for('return_book', userbook_id=book_with_deadline.book.id) }}" method="post">
-                <button type="submit">Return Book</button>
-            </form>
-        </div>
-{% endfor %}
 </body>
 </html>

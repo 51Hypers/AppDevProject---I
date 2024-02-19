@@ -1,111 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>User Dashboard</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
     <style>
-        body {
-            color: #fff;
-            background-color: #343a40; /* Adjust background color */
-        }
-        .dashboard-container {
-            display: flex;
-            margin-top: 20px;
-        }
-        .dashboard-left, .dashboard-right {
-            flex: 1;
-        }
-        .stats, .deadlines, .waiting-approval, .finished-books, .finished-sections, .all-books, .all-sections, .search-books {
-            background-color: #580000; /* Maroon background */
-            margin: 10px;
-            padding: 20px;
-            border-radius: 5px;
-        }
-        .dashboard-right {
-            display: flex;
-            flex-wrap: wrap;
-        }
-        .dashboard-column {
-            flex: 50%;
-        }
-        .btn-custom {
-            background-color: #900;
-            color: #fff;
-            border: none;
-        }
-        .btn-custom:hover {
-            background-color: #a00;
-        }
-        .form-custom {
-            margin-top: 20px;
-        }
-        input[type="text"] {
-            margin-bottom: 10px;
-        }
+      body {
+        color: #fff;
+        background-color: #343a40; /* Adjust background color */
+      }
+      .dashboard-container {
+        display: flex;
+        margin-top: 20px;
+      }
+      .dashboard-left,
+      .dashboard-right {
+        flex: 1;
+      }
+      .stats,
+      .deadlines,
+      .waiting-approval,
+      .finished-books,
+      .finished-sections,
+      .all-books,
+      .all-sections,
+      .search-books {
+        background-color: #580000; /* Maroon background */
+        margin: 10px;
+        padding: 20px;
+        border-radius: 5px;
+      }
+      .dashboard-right {
+        display: flex;
+        flex-wrap: wrap;
+      }
+      .dashboard-column {
+        flex: 50%;
+      }
+      .btn-custom {
+        background-color: #900;
+        color: #fff;
+        border: none;
+      }
+      .btn-custom:hover {
+        background-color: #a00;
+      }
+      .form-custom {
+        margin-top: 20px;
+      }
+      input[type='text'] {
+        margin-bottom: 10px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <h2 class="text-center my-4">User Dashboard</h2>
-        <div class="dashboard-container">
-            <div class="dashboard-left">
-                <!-- Placeholder for Stats & Graphs -->
-                <div class="stats">Stats & Graphs Here</div>
-                <!-- All Books -->
-                <div class="all-books">
-                    <h4>Available Books</h4>
-                    <a href="{{ url_for('list_all_books') }}" class="btn btn-custom btn-sm">View & Request Books</a>
-                <!-- Search Books -->
-                <div class="search-books">
-                    <h4>Search Books</h4>
-                    <h1>Filter Books</h1>
-                    <form action="/books/filter" method="GET">
-                        <select name="filter_type" id="filter_type">
-                            <option value="all">All</option>
-                            <option value="section">Section</option>
-                            <option value="author">Author</option>
-                        </select>
-                        <input type="text" name="query" placeholder="Enter your filter query...">
-                        <button type="submit">Filter</button>
-                    </form>
-                </div>
-                
-
-
-                    <!-- Deadlines -->
-                    <div class="deadlines">
-                        <h4><a href="{{ url_for('view_borrowed_books_with_deadlines') }}" class="text-white">Deadlines</a></h4>
-                        <!-- Placeholder for Deadlines List -->
-                    </div>
-                    <!-- Finished Books -->
-                    <div class="finished-books">
-                        <h4>Finished Books</h4>
-                        <!-- Placeholder for Finished Books List -->
-                        <a href="{{ url_for('view_finished_books') }}" class="btn btn-custom btn-sm">View All</a>
-                    </div>
-                </div>
-                <div class="dashboard-column">
-                    <!-- Waiting for Approval -->
-                    <div class="waiting-approval">
-                        <h4>Waiting for Approval</h4>
-                        <!-- Placeholder for Books Waiting Approval -->
-                        <a href="{{ url_for('requested_books') }}" class="btn btn-custom btn-sm">View Requests</a>
-                    </div>
-                    <!-- Finished Sections -->
-                    <div class="finished-sections">
-                        <h4>Finished Sections</h4>
-                        <!-- Placeholder for Finished Sections List -->
-                        <a href="{{ url_for('view_finished_books_by_section') }}" class="btn btn-custom btn-sm">View All Sections</a>
-                    </div>
-                </div>
+      <h2 class="text-center my-4">User Dashboard</h2>
+      <div class="dashboard-container">
+        <div class="dashboard-left">
+          <!-- Placeholder for Stats & Graphs -->
+          <div class="stats">Stats & Graphs Here</div>
+          <!-- All Books -->
+          <div class="all-books">
+            <h4>Available Books</h4>
+            <a
+              href="{{ url_for('list_all_books') }}"
+              class="btn btn-custom btn-sm"
+              >View & Request Books</a
+            >
+            <!-- Search Books -->
+            <div class="search-books">
+              <h4>Search Books</h4>
+              <h1>Filter Books</h1>
+              <form action="/books/filter" method="GET">
+                <select name="filter_type" id="filter_type">
+                  <option value="all">All</option>
+                  <option value="section">Section</option>
+                  <option value="author">Author</option>
+                </select>
+                <input
+                  type="text"
+                  name="query"
+                  placeholder="Enter your filter query..."
+                />
+                <button type="submit">Filter</button>
+              </form>
             </div>
+
+            <!-- Deadlines -->
+            <div class="deadlines">
+              <h4>Deadline</h4>
+              <ul>
+                {% for user_book, book in upcoming_deadlines %}
+                <li>
+                  <strong>{{ book.name }}</strong> - Deadline: {{
+                  user_book.t_deadline }}
+                </li>
+                {% endfor %}
+              </ul>
+
+              <a href="{{ url_for('view_borrowed_books_with_deadlines') }}"
+                >View All Deadlines</a
+              >
+            </div>
+
+            <!-- Finished Books -->
+            <div class="finished-books">
+              <h4>Finished Books</h4>
+              <!-- Placeholder for Finished Books List -->
+              <a
+                href="{{ url_for('view_finished_books') }}"
+                class="btn btn-custom btn-sm"
+                >View All</a
+              >
+            </div>
+          </div>
+          <div class="dashboard-column">
+            <!-- Waiting for Approval -->
+            <div class="waiting-approval">
+              <h4>Waiting for Approval</h4>
+              <!-- Placeholder for Books Waiting Approval -->
+              <a
+                href="{{ url_for('requested_books') }}"
+                class="btn btn-custom btn-sm"
+                >View Requests</a
+              >
+            </div>
+            <!-- Finished Sections -->
+            <div class="finished-sections">
+              <h4>Finished Sections</h4>
+              <!-- Placeholder for Finished Sections List -->
+              <a
+                href="{{ url_for('view_finished_books_by_section') }}"
+                class="btn btn-custom btn-sm"
+                >View All Sections</a
+              >
+            </div>
+          </div>
         </div>
+      </div>
+      <h1>Logout</h1>
+      <a href="{{ url_for('logout') }}">Logout</a>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
+  </body>
 </html>

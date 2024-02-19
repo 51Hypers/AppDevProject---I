@@ -125,7 +125,7 @@ def logout():
 
 
 # <-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------> #
-
+from operator import itemgetter
 
 # BOOKS VIEWS
 @app.route('/dashboards/user_dashboard')
@@ -153,8 +153,11 @@ def user_dashboard():
     
     if deadline_warning_issued:
         flash('Warning: One or more of your borrowed books are due within the next day. Please return them on time to avoid losing access.', 'warning')
-
-    return render_template('dashboards/user_dashboard.html', borrowed_books=borrowed_books)
+    
+    upcoming_deadlines = [(user_book, book) for user_book, book in borrowed_books if user_book.t_deadline and user_book.t_deadline > now]
+    upcoming_deadlines.sort(key=lambda x: x[0].t_deadline)  # Sort by deadline
+    upcoming_deadlines = upcoming_deadlines[:3]
+    return render_template('dashboards/user_dashboard.html', borrowed_books=borrowed_books,upcoming_deadlines=upcoming_deadlines)
 
 
 @app.route('/books', methods=['GET'])
@@ -242,22 +245,22 @@ def view_borrowed_books_with_deadlines():
 
     books_with_deadlines = []
     for user_book, book in borrowed_books:
-        # Ensure that there is a deadline date before attempting subtraction
         if user_book.t_deadline:
             days_until_deadline = (user_book.t_deadline - datetime.utcnow()).days
         else:
-            # Handle case where t_deadline is None; you might set a default or skip
-            # For example, using a default deadline of 14 days from now
             default_deadline = datetime.utcnow() + timedelta(days=14)
             days_until_deadline = (default_deadline - datetime.utcnow()).days
 
         books_with_deadlines.append({
-            'book': book,
-            'deadline': user_book.t_deadline or default_deadline,  # Use t_deadline if available, otherwise default
+            'user_book_id': user_book.id,
+            'book_name': book.name,
+            'deadline': user_book.t_deadline.isoformat() if user_book.t_deadline else None,
             'days_until_deadline': days_until_deadline
         })
 
     return render_template('users/books_with_deadlines.html', books_with_deadlines=books_with_deadlines)
+
+
 
 
 @app.route('/requested_books')
@@ -359,16 +362,18 @@ def return_book(userbook_id):
         
         # Check if the book is returned after the deadline
         if datetime.utcnow() > userbook.t_deadline:
-            # Setting is_approved to False to indicate revoking borrowing privileges due to late return
-            userbook.is_approved = False
+            # Setting is_approved to 0 to indicate revoking borrowing privileges due to late return
+            userbook.is_approved = 0
             flash('Returned late. Borrowing privileges have been revoked.', 'error')
         else:
+            userbook.is_approved = 0
             flash('Book returned successfully.', 'success')
         db.session.commit()
     else:
         flash('Book return failed. Invalid request.', 'error')
     
     return redirect(url_for('view_borrowed_books_with_deadlines'))
+
 
 
 # <-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------> #
