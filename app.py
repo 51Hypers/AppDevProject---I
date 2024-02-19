@@ -9,6 +9,7 @@ from models import User, Section, Book, UserBook
 from sqlalchemy.orm.exc import NoResultFound
 from models import LibrarianRequest
 from datetime import datetime, timedelta
+from sqlalchemy.exc import IntegrityError
 
 
 # DECORATORS
@@ -34,38 +35,6 @@ def login_required(f):
 def index():
     return render_template('home_page/index.html')
 
-
-@app.route('/admin', methods=['GET', 'POST'])
-def admin():
-    if request.method == 'GET':
-        return render_template('admin_login.html')  # Admin login form
-    else:
-        password = request.form['password']
-        if password == '1':  # Replace 'your_admin_password' with your actual admin password
-            librarian_requests = LibrarianRequest.query.all()
-            return render_template('admin_panel.html', librarian_requests=librarian_requests)
-        else:
-            return render_template('admin_login.html', error='Invalid password')
-
-@app.route('/admin/action', methods=['POST'])
-def admin_action():
-    action = request.form['action']
-    librarian_request_id = request.form['librarian_request_id']
-    librarian_request = LibrarianRequest.query.get(librarian_request_id)
-
-    if action == 'accept':
-        librarian = User(
-            username=librarian_request.username,
-            email=librarian_request.email,
-            password=librarian_request.password,
-            is_librarian=True
-        )
-        db.session.add(librarian)
-    db.session.delete(librarian_request)
-    db.session.commit()
-
-    librarian_requests = LibrarianRequest.query.all()
-    return render_template('admin_panel.html', librarian_requests=librarian_requests)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -265,8 +234,6 @@ def view_borrowed_books_with_deadlines():
     return render_template('users/books_with_deadlines.html', books_with_deadlines=books_with_deadlines)
 
 
-
-
 @app.route('/requested_books')
 def requested_books():
     user_id = session.get('user_id')
@@ -409,12 +376,6 @@ def librarian_dashboard():
     return render_template('dashboards/librarian_dashboard.html', borrowed_books=borrowed_books)
 
 
-from flask import Flask, request, render_template
-from sqlalchemy.exc import IntegrityError
-from models import Book, Section, db
-
-
-
 @app.route('/manage', methods=['GET', 'POST'])
 def manage():
     if request.method == 'POST':
@@ -467,11 +428,32 @@ def manage():
                 return 'Section updated successfully', 200
             else:
                 return 'Section not found', 404
+        elif action == 'change_book_section':
+            for key, value in request.form.items():
+                if key.startswith('new_section_id_'):
+                    book_id = key.replace('new_section_id_', '')
+                    new_section_id = value
+
+                    book = Book.query.get(book_id)
+                    if book:
+                        book.section_id = new_section_id
+                        db.session.commit()
+
+            # Redirect to avoid resubmission on refresh
+            return redirect(url_for('manage'))
+
+        elif action == 'search_books':
+            search_query = request.form.get('book_search')
+
+            if search_query:
+                books = Book.query.filter(Book.name.ilike(f'%{search_query}%')).all()
+            else:
+                books = []
+
+            sections = Section.query.all()
+            return render_template('librarian/manage.html', sections=sections, books=books)
     sections = Section.query.all()
     return render_template('librarian/manage.html',sections=sections)
-
-
-
 
 
 @app.route('/user', methods=['GET'])
@@ -560,28 +542,37 @@ def add_section():
 
 
 # ADMIN VIEWS
-@app.route('/admin/users', methods=['GET'])
-def list_all_users_for_admin():
-    users_query = db.session.query(User).filter(User.is_admin == False)
-    if not request.args.get('show_librarians'):
-        users_query = users_query.filter(User.is_librarian == False)
-    return render_template('admin/all_users.html', users=users_query.all())
+@app.route('/admin', methods=['GET', 'POST'])
+def admin():
+    if request.method == 'GET':
+        return render_template('admin_login.html')  # Admin login form
+    else:
+        password = request.form['password']
+        if password == '1':  # Replace 'your_admin_password' with your actual admin password
+            librarian_requests = LibrarianRequest.query.all()
+            return render_template('admin_panel.html', librarian_requests=librarian_requests)
+        else:
+            return render_template('admin/admin_login.html', error='Invalid password')
 
+@app.route('/admin/action', methods=['POST'])
+def admin_action():
+    action = request.form['action']
+    librarian_request_id = request.form['librarian_request_id']
+    librarian_request = LibrarianRequest.query.get(librarian_request_id)
 
-@app.route('/admin/grant_librarian', methods=['POST'])
-def make_librarian_grant():
-    user_id = request.form['user_id']
-    user: User = db.session.query(User).filter(User.id == user_id).one()
-    user.grant_librarian_access()
-    return redirect(url_for('admin/users'))
+    if action == 'accept':
+        librarian = User(
+            username=librarian_request.username,
+            email=librarian_request.email,
+            password=librarian_request.password,
+            is_librarian=True
+        )
+        db.session.add(librarian)
+    db.session.delete(librarian_request)
+    db.session.commit()
 
-
-@app.route('/admin/revoke_librarian', methods=['POST'])
-def make_librarian_revoke():
-    user_id = request.form['user_id']
-    user: User = db.session.query(User).filter(User.id == user_id).one()
-    user.revoke_librarian_access()
-    return redirect(url_for('admin/users'))
+    librarian_requests = LibrarianRequest.query.all()
+    return render_template('admin/admin_panel.html', librarian_requests=librarian_requests)
 
 
 # DASHBOARDS

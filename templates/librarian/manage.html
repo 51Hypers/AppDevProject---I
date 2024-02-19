@@ -48,6 +48,37 @@
       <input type="submit" value="Edit Section" />
     </form>
 
-   
+    <h1>Search Books</h1>
+    <form method="POST" action="/manage">
+      <input type="hidden" name="action" value="search_books" />
+      <label for="book_search">Search for Book:</label><br />
+      <input type="text" id="book_search" name="book_search" /><br />
+      <input type="submit" value="Search" />
+    </form>
+
+    {% if books %}
+    <h2>Search Results:</h2>
+    <form method="POST" action="/manage">
+      <input type="hidden" name="action" value="change_book_section" />
+      <ul>
+        {% for book in books %}
+        <li>
+          {{ book.name }} - {{ book.author }} - Section: {{ book.section.name }}
+          <input
+            type="hidden"
+            name="book_id_{{ book.id }}"
+            value="{{ book.id }}"
+          />
+          <select name="new_section_id_{{ book.id }}">
+            {% for section in sections %}
+            <option value="{{ section.id }}">{{ section.name }}</option>
+            {% endfor %}
+          </select>
+        </li>
+        {% endfor %}
+      </ul>
+      <input type="submit" value="Update Sections" />
+    </form>
+    {% endif %}
   </body>
 </html>
