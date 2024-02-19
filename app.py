@@ -7,6 +7,7 @@ from nit import app, db
 from flask import render_template, render_template_string, request, redirect, send_file, url_for, session, flash
 from models import User, Section, Book, UserBook
 from sqlalchemy.orm.exc import NoResultFound
+from models import LibrarianRequest
 from datetime import datetime, timedelta
 
 
@@ -34,6 +35,38 @@ def index():
     return render_template('home_page/index.html')
 
 
+@app.route('/admin', methods=['GET', 'POST'])
+def admin():
+    if request.method == 'GET':
+        return render_template('admin_login.html')  # Admin login form
+    else:
+        password = request.form['password']
+        if password == '1':  # Replace 'your_admin_password' with your actual admin password
+            librarian_requests = LibrarianRequest.query.all()
+            return render_template('admin_panel.html', librarian_requests=librarian_requests)
+        else:
+            return render_template('admin_login.html', error='Invalid password')
+
+@app.route('/admin/action', methods=['POST'])
+def admin_action():
+    action = request.form['action']
+    librarian_request_id = request.form['librarian_request_id']
+    librarian_request = LibrarianRequest.query.get(librarian_request_id)
+
+    if action == 'accept':
+        librarian = User(
+            username=librarian_request.username,
+            email=librarian_request.email,
+            password=librarian_request.password,
+            is_librarian=True
+        )
+        db.session.add(librarian)
+    db.session.delete(librarian_request)
+    db.session.commit()
+
+    librarian_requests = LibrarianRequest.query.all()
+    return render_template('admin_panel.html', librarian_requests=librarian_requests)
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
@@ -58,27 +91,31 @@ def login():
             return redirect(url_for('login'))
 
 
-@app.route('/sign_up', methods=['GET', 'POST'])
+@app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'GET':
-        return render_template('home_page/sign_up.html')
-    else:
-        username_exists = db.session.query(User).filter(User.username == request.form['username']).first()
-        email_exists = db.session.query(User).filter(User.email == request.form['email']).first()
+        return render_template('home_page/signup.html')
+    elif request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        role = request.form['role']
 
-        if username_exists:
-            return render_template('home_page/sign_up.html', error='Username already in use')
-        elif email_exists:
-            return render_template('home_page/sign_up.html', error='Email already in use')
-        else:
-            user = User(
-                username=request.form['username'],
-                email=request.form['email'],
-                password=request.form['password'],
-            )
-            db.session.add(user)
-            db.session.commit()
-            return redirect(url_for('user_dashboard'))  
+        if User.query.filter_by(username=username).first():
+            return render_template('home_page/signup.html', error='Username already exists')
+        if User.query.filter_by(email=email).first():
+            return render_template('home_page/signup.html', error='Email already exists')
+
+        if role == 'user':
+            new_user = User(username=username, email=email, password=password, is_librarian=False)
+            db.session.add(new_user)
+        elif role == 'librarian':
+            new_librarian_request = LibrarianRequest(username=username, email=email, password=password)
+            db.session.add(new_librarian_request)
+
+        db.session.commit()
+        return redirect(url_for('login'))
+
 
 
 @app.route('/logout')
@@ -231,8 +268,9 @@ def requested_books():
         return redirect(url_for('login'))
 
     # Query for books that the current user has requested and are awaiting approval
-    requested_books = db.session.query(UserBook, Book).join(Book, UserBook.book_id == Book.id)\
-                      .filter(UserBook.user_id == user_id, UserBook.is_approved == False, UserBook.is_rejected == False).all()
+    requested_books = db.session.query(UserBook, Book).join(Book)\
+                  .filter(UserBook.user_id == user_id, UserBook.is_approved == False, UserBook.is_rejected == False).all()
+    print(requested_books)
 
     return render_template('users/requested_books.html', requested_books=requested_books)
 
@@ -389,15 +427,15 @@ def list_all_requests():
     rejected_requests = db.session.query(UserBook).join(Book, Book.id == UserBook.book_id).join(User, User.id == UserBook.user_id).filter(UserBook.is_rejected == True).all()
     return render_template('librarian/requests.html', unapproved_requests=unapproved_requests, rejected_requests=rejected_requests)
 
+
 @app.route('/stats')
 def get_books_stats():
-    if request.args.get('books'):
-        userbooks = db.session.query(UserBook).join(Book).all()
-    elif request.args.get('users'):
-        userbooks = db.session.query(UserBook).join(User).all()
-    else:
-        return render_template('404_template.html', error='Invalid Stats Request')
-    return render_template('librarian/book_stats.html', userbooks=userbooks)
+    requested_books = UserBook.query.filter_by(is_approved=False, is_rejected=False).all()
+    borrowed_books = UserBook.query.filter_by(is_approved=True, is_returned=False).all()
+    all_books = Book.query.all()
+
+    return render_template('librarian/book_stats.html', requested_books=requested_books, borrowed_books=borrowed_books, all_books=all_books, Book=Book)
+
 
 @app.route('/request/<action>', methods=['POST'])
 def approve_book_request(action: str):

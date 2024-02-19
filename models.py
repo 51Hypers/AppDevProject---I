@@ -36,7 +36,17 @@ class User(db.Model):
     def revoke_librarian_access(self):
         self.is_librarian = False
         db.session.commit()
+class LibrarianRequest(db.Model):
+    __tablename__ = "librarian_request"
+    id = Column(Integer, primary_key=True)
+    username = Column(String(50), unique=True, nullable=False)
+    email = Column(String(100), unique=True, nullable=False)
+    password = Column(String(50), nullable=False)
 
+    def __init__(self, username, email, password):
+        self.username = username
+        self.email = email
+        self.password = password
 
 class Book(db.Model):
     __table_name__ = "book"

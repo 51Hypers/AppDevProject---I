@@ -58,23 +58,21 @@
                     <h4>Available Books</h4>
                     <a href="{{ url_for('list_all_books') }}" class="btn btn-custom btn-sm">View & Request Books</a>
                 <!-- Search Books -->
-                    <div class="search-books">
-                        <h4>Search Books</h4>
-                        <form id="searchForm" action="{{ url_for('list_books_by_filter') }}" method="get" class="form-custom">
-                            <div class="form-group">
-                                <label for="filterType">Filter Type</label>
-                                <select id="filterType" name="filter_type" class="form-control">
-                                    <option value="all">All</option>
-                                    <option value="section">By Section</option>
-                                    <option value="author">By Author</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <input type="text" class="form-control" id="searchInput" name="query" placeholder="Search by Title or Author">
-                            </div>
-                            <button type="submit" class="btn btn-custom btn-sm">Search</button>
-                        </form>
-                    </div>
+                <div class="search-books">
+                    <h4>Search Books</h4>
+                    <h1>Filter Books</h1>
+                    <form action="/books/filter" method="GET">
+                        <select name="filter_type" id="filter_type">
+                            <option value="all">All</option>
+                            <option value="section">Section</option>
+                            <option value="author">Author</option>
+                        </select>
+                        <input type="text" name="query" placeholder="Enter your filter query...">
+                        <button type="submit">Filter</button>
+                    </form>
+                </div>
+                
+
 
                     <!-- Deadlines -->
                     <div class="deadlines">

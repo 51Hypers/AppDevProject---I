@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Panel</title>
+</head>
+<body>
+    <h1>Admin Panel</h1>
+    <table>
+        <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Action</th>
+        </tr>
+        {% for request in librarian_requests %}
+        <tr>
+            <td>{{ request.username }}</td>
+            <td>{{ request.email }}</td>
+            <td>
+                <form method="POST" action="/admin/action">
+                    <input type="hidden" name="librarian_request_id" value="{{ request.id }}">
+                    <select name="action">
+                        <option value="accept">Accept</option>
+                        <option value="reject">Reject</option>
+                    </select>
+                    <input type="submit" value="Submit">
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

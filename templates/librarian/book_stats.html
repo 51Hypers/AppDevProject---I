@@ -1,55 +1,41 @@
-<!-- templates/librarian/book_stats.html -->
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
+<html>
+  <head>
     <title>Book Statistics</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <!-- Ensure the path to your CSS file is correct -->
-</head>
-<body>
-    <h1>Statistics</h1>
+    <!-- Add any necessary CSS or meta tags here -->
+  </head>
+  <body>
+    <h1>Book Statistics</h1>
 
-    {% if request.args.get('books') %}
-        <h2>Books Statistics</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Book Title</th>
-                    <th>Total Requests</th>
-                    <!-- Add more headers as needed -->
-                </tr>
-            </thead>
-            <tbody>
-                {% for ub in userbooks %}
-                    <tr>
-                        <td>{{ ub.book.title }}</td>
-                        <td>{{ ub.book.userbooks.count() }}</td>
-                        <!-- Add more details as needed -->
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% elif request.args.get('users') %}
-        <h2>User Statistics</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>User</th>
-                    <th>Total Book Requests</th>
-                    <!-- Add more headers as needed -->
-                </tr>
-            </thead>
-            <tbody>
-                {% for ub in userbooks %}
-                    <tr>
-                        <td>{{ ub.user.username }}</td>
-                        <td>{{ ub.user.userbooks.count() }}</td>
-                        <!-- Add more details as needed -->
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
-</body>
+    <h2>Requested Books:</h2>
+    <ul>
+      {% for userbook in requested_books %} {% set book =
+      Book.query.get(userbook.book_id) %}
+      <li>
+        <strong>User:</strong> {{ userbook.user.username }},
+        <strong>Book:</strong> {{ book.name }}
+      </li>
+      {% endfor %}
+    </ul>
+
+    <h2>Borrowed Books:</h2>
+    <ul>
+      {% for userbook in borrowed_books %} {% set book =
+      Book.query.get(userbook.book_id) %}
+      <li>
+        <strong>User:</strong> {{ userbook.user.username }},
+        <strong>Book:</strong> {{ book.name }}, <strong>Deadline:</strong> {{
+        userbook.t_return.strftime('%Y-%m-%d') if userbook.t_return else 'None'
+        }}
+      </li>
+      {% endfor %}
+    </ul>
+
+    <h2>All Books:</h2>
+    <ul>
+      {% for book in all_books %}
+      <li>{{ book.name }}</li>
+      {% endfor %}
+    </ul>
+  </body>
 </html>
