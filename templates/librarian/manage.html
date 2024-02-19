@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Library Management</title>
+  </head>
+  <body>
+    <h1>Add Books</h1>
+    <form method="POST" action="/manage">
+      <input type="hidden" name="action" value="add_book" />
+      <label for="name">Name:</label><br />
+      <input type="text" id="name" name="name" /><br />
+      <label for="content">Content:</label><br />
+      <textarea id="content" name="content"></textarea><br />
+      <label for="author">Author:</label><br />
+      <input type="text" id="author" name="author" /><br />
+      <label for="section_id">Section:</label><br />
+      <select id="section_id" name="section_id">
+        {% for section in sections %}
+        <option value="{{ section.id }}">{{ section.name }}</option>
+        {% endfor %}</select
+      ><br />
+      <input type="submit" value="Add Book" />
+    </form>
+
+    <h1>Add Sections</h1>
+    <form method="POST" action="/manage">
+      <input type="hidden" name="action" value="add_section" />
+      <label for="section_name">Section Name:</label><br />
+      <input type="text" id="section_name" name="section_name" /><br />
+      <label for="section_desc">Section Description:</label><br />
+      <textarea id="section_desc" name="section_desc"></textarea><br />
+      <input type="submit" value="Add Section" />
+    </form>
+
+    <h1>Edit Sections</h1>
+    <form method="POST" action="/manage">
+      <input type="hidden" name="action" value="edit_section" />
+      <label for="section_id_edit">Select Section to Edit:</label><br />
+      <select id="section_id_edit" name="section_id">
+        {% for section in sections %}
+        <option value="{{ section.id }}">{{ section.name }}</option>
+        {% endfor %}</select
+      ><br />
+      <label for="new_name">New Name:</label><br />
+      <input type="text" id="new_name" name="new_name" /><br />
+      <label for="new_desc">New Description:</label><br />
+      <textarea id="new_desc" name="new_desc"></textarea><br />
+      <input type="submit" value="Edit Section" />
+    </form>
+
+   
+  </body>
+</html>

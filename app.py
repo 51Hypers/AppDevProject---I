@@ -404,6 +404,71 @@ def librarian_dashboard():
     return render_template('dashboards/librarian_dashboard.html', borrowed_books=borrowed_books)
 
 
+from flask import Flask, request, render_template
+from sqlalchemy.exc import IntegrityError
+from models import Book, Section, db
+
+
+
+@app.route('/manage', methods=['GET', 'POST'])
+def manage():
+    if request.method == 'POST':
+        action = request.form.get('action')
+        if action == 'add_book':
+            name = request.form.get('name')
+            content = request.form.get('content')
+            author = request.form.get('author')
+            section_id = request.form.get('section_id')
+
+            if not all([name, content, author, section_id]):
+                return 'Missing data', 400
+
+            try:
+                book = Book(name=name, content=content, author=author, section_id=section_id)
+                db.session.add(book)
+                db.session.commit()
+                return 'Book added successfully', 201
+            except IntegrityError:
+                db.session.rollback()
+                return 'Section does not exist', 404
+
+        elif action == 'add_section':
+            name = request.form.get('section_name')
+            desc = request.form.get('section_desc')
+
+            if not all([name, desc]):
+                return 'Missing data', 400
+
+            section = Section(name=name, desc=desc)
+            db.session.add(section)
+            db.session.commit()
+            return 'Section added successfully', 201
+
+        elif action == 'edit_section':
+            section_id = request.form.get('section_id')
+            new_name = request.form.get('new_name')
+            new_desc = request.form.get('new_desc')
+
+            if not section_id:
+                return 'Missing section ID', 400
+
+            section = Section.query.get(section_id)
+            if section:
+                if new_name:
+                    section.name = new_name
+                if new_desc:
+                    section.desc = new_desc
+                db.session.commit()
+                return 'Section updated successfully', 200
+            else:
+                return 'Section not found', 404
+    sections = Section.query.all()
+    return render_template('librarian/manage.html',sections=sections)
+
+
+
+
+
 @app.route('/user', methods=['GET'])
 def list_all_users():
     users = db.session.query(User).filter(User.is_librarian == False).filter(User.is_admin == False).all()
