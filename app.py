@@ -102,9 +102,11 @@ def signup():
         role = request.form['role']
 
         if User.query.filter_by(username=username).first():
-            return render_template('home_page/signup.html', error='Username already exists')
+            flash('Username already exists', 'error')
+            return render_template('home_page/signup.html')
         if User.query.filter_by(email=email).first():
-            return render_template('home_page/signup.html', error='Email already exists')
+            flash('Email already exists', 'error')
+            return render_template('home_page/signup.html')
 
         if role == 'user':
             new_user = User(username=username, email=email, password=password, is_librarian=False)
@@ -114,6 +116,7 @@ def signup():
             db.session.add(new_librarian_request)
 
         db.session.commit()
+        flash('Account created successfully', 'success')
         return redirect(url_for('login'))
 
 
