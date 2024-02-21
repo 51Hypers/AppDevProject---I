@@ -12,7 +12,7 @@
         <p>Registered on: {{ user.t_register.strftime('%Y-%m-%d %H:%M:%S') }}</p>
         <h3>Unapproved Requests</h3>
         {% for request in user.unapproved_requests %}
-            <p>Book ID: {{ request.book_id }}, Requested On: {{ request.t_request }}</p>
+            <p>Book Title: {{ request.book.name }}, Book ID: {{ request.book_id }}, Requested On: {{ request.t_request }}</p>
         {% else %}
             <p>No unapproved requests.</p>
         {% endfor %}

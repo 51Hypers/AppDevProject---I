@@ -489,7 +489,7 @@ def list_all_requests():
 @app.route('/stats')
 def get_books_stats():
     requested_books = UserBook.query.filter_by(is_approved=False, is_rejected=False, t_return=None, t_deadline=None).all()
-    borrowed_books = UserBook.query.filter(is_approved=True, is_rejected=False).all()
+    borrowed_books = UserBook.query.filter_by(is_approved=True, is_rejected=False).all()
     all_books = Book.query.all()
 
     return render_template('librarian/book_stats.html', requested_books=requested_books, borrowed_books=borrowed_books, all_books=all_books, Book=Book)
