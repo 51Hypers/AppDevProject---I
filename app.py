@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 from sqlalchemy import Null, or_
 from nit import app, db
 from flask import render_template, render_template_string, request, redirect, send_file, url_for, session, flash
-from models import User, Section, Book, UserBook
+from models import User, Section, Book, UserBook, Feedback
 from sqlalchemy.orm.exc import NoResultFound
 from models import LibrarianRequest
 from datetime import datetime, timedelta
@@ -134,12 +134,27 @@ def user_dashboard():
 
 @app.route('/books', methods=['GET'])
 def list_all_books():
-    books = Book.query.order_by('name').all()
-    sections = db.session.query(Section).all()
-    authors = db.session.query(Book).distinct(Book.author).all()
+    books = db.session.query(Book, Section, func.avg(Feedback.rating).label('average_rating')).\
+        join(Section, Book.section_id == Section.id).\
+        outerjoin(Feedback, Book.id == Feedback.book_id).\
+        group_by(Book.id).all()
+
+    authors = db.session.query(Book.author).distinct().all()
     return render_template(
-        'books/books.html', books=books, sections=sections, authors=authors
+        'books/books.html', books=books, authors=authors
     )
+
+
+#view feedback
+@app.route('/books/<int:book_id>/feedback', methods=['GET'])
+def view_feedback(book_id):
+    book = Book.query.get(book_id)
+    if not book:
+        return 'Book not found', 404
+
+    feedback = Feedback.query.filter_by(book_id=book_id).all()
+    return render_template('books/view_feedback.html', book=book, feedback=feedback)
+
 
 
 @app.route('/books/filter', methods=['GET'])
@@ -618,6 +633,46 @@ def sections_of_interest_chart():
         else:
             sections_of_interest_data[section_name] = 1
     return jsonify(sections_of_interest_data)
+
+
+#feedback
+@app.route('/give_feedback/<int:book_id>', methods=['GET'])
+def give_feedback(book_id):
+    return render_template('users/feedback_form.html', book_id=book_id)
+@app.route('/submit_feedback', methods=['POST'])
+def submit_feedback():
+    user_id = session.get('user_id')
+    if not user_id:
+        return 'User not logged in', 401 
+
+    book_id = request.form['book_id']
+    rating = request.form['rating']
+    feedback_text = request.form['feedback_text']
+    existing_feedback = Feedback.query.filter_by(user_id=user_id, book_id=book_id).first()
+    if existing_feedback:
+        existing_feedback.rating = rating
+        existing_feedback.feedback_text = feedback_text
+    else:
+        feedback = Feedback(user_id=user_id, book_id=book_id, rating=rating, feedback_text=feedback_text)
+        db.session.add(feedback)
+
+    db.session.commit()
+
+    return 'Feedback submitted successfully'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 if __name__ == "__main__":

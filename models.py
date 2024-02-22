@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer, String,
                         Text)
 from sqlalchemy.orm import Relationship
-
+from sqlalchemy import CheckConstraint
 from nit import db
 
 class User(db.Model):
@@ -125,3 +125,27 @@ class UserBook(db.Model):
     
     user = db.relationship('User', back_populates='user_books')
     book = db.relationship('Book', back_populates='user_books')
+
+class Feedback(db.Model):
+    __tablename__ = "feedback"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    book_id = Column(Integer, ForeignKey('book.id'), nullable=False)
+    rating = Column(Integer, nullable=False)
+    feedback_text = Column(Text, nullable=True)
+
+    __table_args__ = (
+        CheckConstraint('rating >= 1 AND rating <= 5', name='check_rating'),
+    )
+
+    def __init__(
+            self, id: int = None, user_id: int = None, book_id: int = None, rating: int = None, feedback_text: str = None
+    ) -> None:
+        self.id = id
+        self.user_id = user_id
+        self.book_id = book_id
+        self.rating = rating
+        self.feedback_text = feedback_text
+
+    user = db.relationship('User')
+    book = db.relationship('Book')

@@ -1,41 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Books List</title>
-    <link rel="stylesheet" href="path_to_your_stylesheet.css">
-</head>
-<body>
+    <link rel="stylesheet" href="path_to_your_stylesheet.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Books List</h1>
 
-<div class="container">
-    <h1>Books List</h1>
-
-    <section class="books">
+      <section class="books">
         <h2>Books</h2>
         <table>
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>Section</th>
-                    <th>Action</th> <!-- New column for actions -->
-                </tr>
-            </thead>
-            <tbody>
-                {% for book in books %}
-                <tr>
-                    <td>{{ book.name }}</td>
-                    <td>{{ book.author }}</td>
-                    <td>{{ book.section.name }}</td> <!-- Adjust according to your model relationships -->
-                    <td>
-                        <a href="{{ url_for('request_book', book_id=book.id) }}" class="btn btn-primary">Request</a>
-                    </td> <!-- Ensure you have defined 'request_book' route and 'book.id' is the correct identifier -->
-                </tr>
-                {% endfor %}
-            </tbody>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Author</th>
+              <th>Section</th>
+              <th>Rating</th>
+              <th>Action</th>
+              <th>Feedback</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for book, section, average_rating in books %}
+            <tr>
+              <td>{{ book.name }}</td>
+              <td>{{ book.author }}</td>
+              <td>{{ section.name }}</td>
+              <td>{{ average_rating }}</td>
+              <td>
+                <a
+                  href="{{ url_for('request_book', book_id=book.id) }}"
+                  class="btn btn-primary"
+                  >Request</a
+                >
+              </td>
+              <td>
+                <a
+                  href="{{ url_for('view_feedback', book_id=book.id) }}"
+                  class="btn btn-secondary"
+                  >View Feedback</a
+                >
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
         </table>
-    </section>
-</div>
-
-</body>
+      </section>
+    </div>
+  </body>
 </html>

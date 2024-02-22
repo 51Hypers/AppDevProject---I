@@ -1,20 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Finished Reading</title>
-</head>
-<body>
+  </head>
+  <body>
     <h1>Books I've Finished Reading</h1>
-    {% if finished_books %}
-        {% for user_book, book in finished_books %}
-        <div>
-            <h2>{{ book.name }} by {{ book.author }}</h2>
-            <p>Returned On: {{ user_book.t_return.strftime('%Y-%m-%d') }}</p>
-        </div>
-        {% endfor %}
-    {% else %}
+    {% if finished_books %} {% for user_book, book in finished_books %}
+    <div>
+      <h2>{{ book.name }} by {{ book.author }}</h2>
+      <p>Returned On: {{ user_book.t_return.strftime('%Y-%m-%d') }}</p>
+      <a
+        href="{{ url_for('give_feedback', book_id=book.id) }}"
+        class="btn btn-primary"
+        >Give Feedback</a
+      >
+    </div>
+    {% endfor %} {% else %}
     <p>You have not finished any books.</p>
     {% endif %}
-</body>
+  </body>
 </html>

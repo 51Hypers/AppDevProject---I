@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>View Feedback</title>
+    <link rel="stylesheet" href="path_to_your_stylesheet.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Feedback for {{ book.name }}</h1>
+
+      <section class="feedback">
+        <h2>Feedback</h2>
+        <ul>
+          {% for fb in feedback %}
+          <li>
+            <p><strong>User:</strong> {{ fb.user.username }}</p>
+            <p><strong>Rating:</strong> {{ fb.rating }}</p>
+            <p><strong>Feedback:</strong> {{ fb.feedback_text }}</p>
+          </li>
+          {% endfor %}
+        </ul>
+      </section>
+    </div>
+  </body>
+</html>
