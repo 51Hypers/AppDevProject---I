@@ -1,75 +1,187 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Librarian Dashboard</title>
-    <!-- Bootstrap CSS CDN for styling -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Chart.js for charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root {
-            --maroon: #800000;
-            --black: #000;
-        }
-        body {
-            background-color: var(--black);
-            color: white;
-        }
-        .navbar, .footer {
-            background-color: var(--maroon);
-        }
-        a, a:hover {
-            color: white;
-        }
+      body {
+        background-color: #000;
+        color: white;
+        margin: 0;
+        padding: 0;
+      }
+      .navbar {
+        background-color: #800000;
+        color: white;
+        text-align: center;
+        padding: 10px 0;
+      }
+      .navbar a {
+        color: white;
+        text-decoration: none;
+        margin: 0 10px;
+      }
+      canvas {
+        top: 150px;
+        left: 50%;
+
+        height: 200px;
+        width: 500px;
+        background-color: transparent; /* Light gray background color */
+        display: block;
+      }
+      .footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #800000;
+        color: white;
+        text-align: center;
+        padding: 10px 0;
+      }
+      #booksBorrowedOverTimeChart {
+        top: 250px;
+        right: 50%;
+        height: 400px;
+        width: 600px;
+        background-color: white; /* Light gray background color */
+        display: block;
+      }
+      .chart-container {
+        display: flex;
+        justify-content: space-between;
+      }
     </style>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <a class="navbar-brand" href="#">Librarian Dashboard</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="/user">List Users</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/users/details">User Details</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/requests">Book Requests</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/stats?books=true">Book Stats</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/stats?users=true">User Stats</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/manage">Manage Books/Sections</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-
-    <div class="container mt-5">
-        <h2>Welcome to the Librarian Dashboard</h2>
-        <p>Use the navigation bar to manage users, view book requests, and access statistics.</p>
-    </div>
-    <h1>Logout</h1>
+  </head>
+  <body>
+    <div class="navbar">
+      <a href="/user">List Users</a>
+      <a href="/users/details">User Details</a>
+      <a href="/requests">Book Requests</a>
+      <a href="/stats?books=true">Book Stats</a>
+      <a href="/stats?users=true">User Stats</a>
+      <a href="/manage">Manage Books/Sections</a>
       <a href="{{ url_for('logout') }}">Logout</a>
-    <footer class="footer mt-auto py-3">
-        <div class="container text-center">
-            <span class="text-muted">Powered by Flask & Bootstrap.</span>
-        </div>
-    </footer>
+    </div>
 
-    <!-- Optional JavaScript; choose one of the two! -->
+    <h2>Welcome to the Librarian Dashboard</h2>
+    <p>
+      Use the navigation bar to manage users, view book requests, and access
+      statistics.
+    </p>
+    <div class="chart-container">
+      <canvas id="sectionDistributionChart"></canvas>
+      <canvas id="booksBorrowedOverTimeChart"></canvas>
+    </div>
 
-    <!-- Option 1: jQuery and Bootstrap Bundle (includes Popper) -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
+    <!-- Script for fetching and displaying section distribution -->
+    <script>
+      fetch('/api/section_distribution')
+        .then((response) => response.json())
+        .then((data) => {
+          var sectionDistributionData = {
+            labels: Object.keys(data),
+            datasets: [
+              {
+                label: 'Section Distribution',
+                data: Object.values(data),
+                backgroundColor: [
+                  'rgba(255, 99, 132, 0.7)',
+                  'rgba(54, 162, 235, 0.7)',
+                  'rgba(255, 206, 86, 0.7)',
+                  'rgba(75, 192, 192, 0.7)',
+                  'rgba(153, 102, 255, 0.7)',
+                ],
+                borderColor: [
+                  'rgba(255, 99, 132, 1)',
+                  'rgba(54, 162, 235, 1)',
+                  'rgba(255, 206, 86, 1)',
+                  'rgba(75, 192, 192, 1)',
+                  'rgba(153, 102, 255, 1)',
+                ],
+                borderWidth: 1,
+              },
+            ],
+          };
+
+          var sectionDistributionChart = new Chart(
+            document.getElementById('sectionDistributionChart'),
+            {
+              type: 'pie',
+              data: sectionDistributionData,
+              options: {
+                responsive: false,
+                maintainAspectRatio: false,
+                title: {
+                  display: true,
+                  text: 'Section Distribution',
+                },
+              },
+            }
+          );
+        });
+    </script>
+    <script>
+      fetch('/api/books_borrowed_over_time')
+        .then((response) => response.json())
+        .then((data) => {
+          var booksBorrowedOverTimeData = {
+            labels: Object.keys(data).map((month) =>
+              new Date(month + ' 00:00:00').toLocaleDateString('en-US', {
+                month: 'short',
+                year: 'numeric',
+              })
+            ),
+            datasets: [
+              {
+                label: 'Number of Books Borrowed Over Time',
+                data: Object.values(data),
+                fill: false,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                lineTension: 0.1,
+              },
+            ],
+          };
+
+          var booksBorrowedOverTimeChart = new Chart(
+            document.getElementById('booksBorrowedOverTimeChart'),
+            {
+              type: 'line',
+              data: booksBorrowedOverTimeData,
+              options: {
+                responsive: false,
+                maintainAspectRatio: false,
+                title: {
+                  display: true,
+                  text: 'Number of Books Borrowed Over Time',
+                },
+                scales: {
+                  xAxes: [
+                    {
+                      type: 'time',
+                      time: {
+                        unit: 'month',
+                        displayFormats: {
+                          month: 'MMM YYYY',
+                        },
+                      },
+                      ticks: {
+                        autoSkip: true,
+                        maxTicksLimit: 10,
+                      },
+                    },
+                  ],
+                },
+              },
+            }
+          );
+        });
+    </script>
+
+    <div class="footer">Powered by Chart.js</div>
+  </body>
 </html>

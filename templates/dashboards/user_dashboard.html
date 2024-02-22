@@ -63,7 +63,11 @@
       <div class="dashboard-container">
         <div class="dashboard-left">
           <!-- Placeholder for Stats & Graphs -->
-          <div class="stats">Stats & Graphs Here</div>
+          <div class="stats">
+            Stats & Graphs Here
+            <h2>Section Distribution</h2>
+            <canvas id="sectionPieChart" width="400" height="400"></canvas>
+          </div>
           <!-- All Books -->
           <div class="all-books">
             <h4>Available Books</h4>
@@ -146,7 +150,58 @@
       <h1>Logout</h1>
       <a href="{{ url_for('logout') }}">Logout</a>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      fetch('/api/sections_of_interest_chart')
+        .then((response) => response.json())
+        .then((data) => {
+          const canvas = document.getElementById('sectionPieChart');
+          const ctx = canvas.getContext('2d');
 
+          const labels = Object.keys(data);
+          const values = Object.values(data);
+
+          const backgroundColors = [
+            'rgba(255, 99, 132, 0.7)',
+            'rgba(54, 162, 235, 0.7)',
+            'rgba(255, 206, 86, 0.7)',
+            'rgba(75, 192, 192, 0.7)',
+            'rgba(153, 102, 255, 0.7)',
+            'rgba(255, 159, 64, 0.7)',
+          ];
+
+          const hoverBackgroundColors = [
+            'rgba(255, 99, 132, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(255, 159, 64, 1)',
+          ];
+
+          new Chart(ctx, {
+            type: 'pie',
+            data: {
+              labels: labels,
+              datasets: [
+                {
+                  data: values,
+                  backgroundColor: backgroundColors,
+                  hoverBackgroundColor: hoverBackgroundColors,
+                },
+              ],
+            },
+            options: {
+              responsive: false,
+              maintainAspectRatio: false,
+              title: {
+                display: true,
+                text: 'Books Read from Each Section',
+              },
+            },
+          });
+        });
+    </script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

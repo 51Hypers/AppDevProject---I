@@ -10,8 +10,8 @@ from sqlalchemy.orm.exc import NoResultFound
 from models import LibrarianRequest
 from datetime import datetime, timedelta
 from sqlalchemy.exc import IntegrityError
-
-
+from flask import Flask, jsonify
+from sqlalchemy import func
 # DECORATORS
 from flask import redirect, url_for, session
 from functools import wraps
@@ -576,6 +576,48 @@ def admin_action():
 
 
 # DASHBOARDS
+@app.route('/api/section_distribution')
+def section_distribution():
+    sections = Section.query.all()
+    distribution_data = {section.name: len(section.books) for section in sections}
+    return jsonify(distribution_data)
+
+
+@app.route('/api/books_borrowed_over_time')
+def books_borrowed_over_time():
+    # Calculate the start date (e.g., 6 months ago)
+    start_date = datetime.utcnow() - timedelta(days=180)
+
+    # Query the database to get the count of borrowed books per month
+    books_borrowed_over_time_data = (
+        db.session.query(func.count(UserBook.id).label('count'), func.strftime('%m', UserBook.t_request).label('month'))
+        .filter(UserBook.t_request >= start_date)
+        .group_by(func.strftime('%m', UserBook.t_request))
+        .order_by(func.strftime('%m', UserBook.t_request))
+        .all()
+    )
+
+    # Convert the query result into a dictionary
+    data_dict = {}
+    for count, month in books_borrowed_over_time_data:
+        data_dict[month] = count
+
+    return jsonify(data_dict)
+
+
+#user charts
+@app.route('/api/sections_of_interest_chart')
+def sections_of_interest_chart():
+    user_id = session.get('user_id')  # Implement a function to get the current user's ID
+    user_books = UserBook.query.filter(UserBook.user_id == user_id, UserBook.t_return.isnot(None)).all()
+    sections_of_interest_data = {}
+    for user_book in user_books:
+        section_name = user_book.book.section.name
+        if section_name in sections_of_interest_data:
+            sections_of_interest_data[section_name] += 1
+        else:
+            sections_of_interest_data[section_name] = 1
+    return jsonify(sections_of_interest_data)
 
 
 if __name__ == "__main__":
