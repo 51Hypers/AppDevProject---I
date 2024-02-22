@@ -163,16 +163,22 @@ def list_books_by_filter():
     query = request.args.get('query', '')
 
     sections = Section.query.all()
+    all_books = Book.query.all()
 
     if filter_type == 'section':
-        section_id = request.args.get('section_id')
-        books = Book.query.filter(Book.section_id == section_id).all()
+        section_id = int(request.args.get('section_id', 0))
+        if section_id:
+            books = [book for book in all_books if book.section_id == section_id]
+        else:
+            books = all_books
     elif filter_type == 'author':
-        books = Book.query.filter(Book.author.ilike(f"%{query}%")).all()
+        books = [book for book in all_books if query.lower() in book.author.lower()]
     else:
-        books = Book.query.filter(or_(Book.name.ilike(f"%{query}%"), Book.author.ilike(f"%{query}%"))).all()
+        books = [book for book in all_books if query.lower() in book.name.lower() or query.lower() in book.author.lower()]
 
     return render_template('books/books_filter.html', books=books, sections=sections, filter_type=filter_type, query=query)
+
+
 
 
 @app.route('/books/view/<book_id>', methods=['GET'])

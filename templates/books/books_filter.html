@@ -43,9 +43,11 @@
                         <span class="card-title">{{ book.name }}</span>
                         <p>Author: {{ book.author }}</p>
                         <p>Section ID: {{ book.section_id }}</p>
+                        <p>Rating: {% if book.average_rating %}{{ book.average_rating }}{% else %}N/A{% endif %}</p>
                     </div>
                     <div class="card-action">
                         <a href="{{ url_for('request_book', book_id=book.id) }}" class="btn waves-effect waves-light">Request</a>
+                        <a href="{{ url_for('view_feedback', book_id=book.id) }}" class="btn waves-effect waves-light">View Feedback</a>
                     </div>
                 </div>
             </div>
