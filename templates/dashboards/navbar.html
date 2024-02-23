@@ -1,0 +1,24 @@
+<style>
+  .navbar {
+    background-color: #800000;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+  }
+
+  .navbar a {
+    color: white;
+    text-decoration: none;
+    margin: 0 10px;
+  }
+</style>
+
+<div class="navbar">
+  <a href="/dashboards/librarian_dashboard">Dashboard</a>
+  <a href="/user">List Users</a>
+  <a href="/users/details">User Details</a>
+  <a href="/requests">Book Requests</a>
+  <a href="/stats?users=true">User Stats</a>
+  <a href="/manage">Manage Books/Sections</a>
+  <a href="{{ url_for('logout') }}">Logout</a>
+</div>

@@ -1,24 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Books with Deadlines</title>
-</head>
-<body>
-    <h1>Books with Deadlines</h1>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Borrowed Books</title>
+  </head>
+  <body>
+    {% include 'dashboards/usernav.html' %}
+    <h1>Borrowed Books</h1>
     {% if books_with_deadlines %}
-        <ul>
-            {% for item in books_with_deadlines %}
-                <li>
-                    <strong>{{ item.book_name }}</strong> - Deadline: {{ item.deadline }} ({{ item.days_until_deadline }} days left)
-                    <form action="{{ url_for('return_book', userbook_id=item.user_book_id) }}" method="post">
-                        <button type="submit">Return</button>
-                    </form>
-                </li>
-            {% endfor %}
-        </ul>
+    <ul>
+      {% for item in books_with_deadlines %}
+      <li>
+        <strong>{{ item.book_name }}</strong> - Deadline: {{ item.deadline }}
+        ({{ item.days_until_deadline }} days left)
+        <form
+          action="{{ url_for('return_book', userbook_id=item.user_book_id) }}"
+          method="post"
+        >
+          <button type="submit">Return</button>
+        </form>
+        <form
+          action="{{ url_for('view_book', book_id=item.book_id) }}"
+          method="get"
+        >
+          <button type="submit">View Book</button>
+        </form>
+      </li>
+      {% endfor %}
+    </ul>
     {% else %}
-        <p>No borrowed books or deadlines to display.</p>
+    <p>No borrowed books or deadlines to display.</p>
     {% endif %}
-</body>
+  </body>
 </html>

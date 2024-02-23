@@ -1,0 +1,25 @@
+<style>
+  .navbar {
+    background-color: #800000;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+  }
+
+  .navbar a {
+    color: white;
+    text-decoration: none;
+    margin: 0 10px;
+  }
+</style>
+
+<div class="navbar">
+  <a href="/dashboards/user_dashboard">Dashboard</a>
+  <a href="/books">Available Books</a>
+  <a href="/books/filter">Search</a>
+  <a href="/requested_books">Waiting for Approval</a>
+  <a href="/books/deadlines">Borrowed Books</a>
+  <a href="/books/finished">Finished Books</a>
+  <a href="/books/finished/by-section">Finished Sections</a>
+  <a href="{{ url_for('logout') }}">Logout</a>
+</div>

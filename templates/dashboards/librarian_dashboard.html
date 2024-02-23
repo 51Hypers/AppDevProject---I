@@ -13,17 +13,6 @@
         margin: 0;
         padding: 0;
       }
-      .navbar {
-        background-color: #800000;
-        color: white;
-        text-align: center;
-        padding: 10px 0;
-      }
-      .navbar a {
-        color: white;
-        text-decoration: none;
-        margin: 0 10px;
-      }
       canvas {
         top: 150px;
         left: 50%;
@@ -58,15 +47,7 @@
     </style>
   </head>
   <body>
-    <div class="navbar">
-      <a href="/user">List Users</a>
-      <a href="/users/details">User Details</a>
-      <a href="/requests">Book Requests</a>
-      <a href="/stats?books=true">Book Stats</a>
-      <a href="/stats?users=true">User Stats</a>
-      <a href="/manage">Manage Books/Sections</a>
-      <a href="{{ url_for('logout') }}">Logout</a>
-    </div>
+    {% include 'dashboards/navbar.html' %}
 
     <h2>Welcome to the Librarian Dashboard</h2>
     <p>

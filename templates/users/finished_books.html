@@ -5,6 +5,7 @@
     <title>Finished Reading</title>
   </head>
   <body>
+    {% include 'dashboards/usernav.html' %}
     <h1>Books I've Finished Reading</h1>
     {% if finished_books %} {% for user_book, book in finished_books %}
     <div>

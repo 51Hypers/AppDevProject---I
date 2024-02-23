@@ -134,15 +134,40 @@ def user_dashboard():
 
 @app.route('/books', methods=['GET'])
 def list_all_books():
-    books = db.session.query(Book, Section, func.avg(Feedback.rating).label('average_rating')).\
-        join(Section, Book.section_id == Section.id).\
-        outerjoin(Feedback, Book.id == Feedback.book_id).\
-        group_by(Book.id).all()
+    sort_by = request.args.get('sort_by', default='name_asc')
 
-    authors = db.session.query(Book.author).distinct().all()
-    return render_template(
-        'books/books.html', books=books, authors=authors
+    sort_column, sort_order = sort_by.split('_')
+
+    books_query = db.session.query(
+        Book, Section, func.avg(Feedback.rating).label('average_rating')
+    ).join(
+        Section, Book.section_id == Section.id
+    ).outerjoin(
+        Feedback, Book.id == Feedback.book_id
+    ).group_by(
+        Book.id
     )
+
+    if sort_column == 'name':
+        sort_key = Book.name
+    elif sort_column == 'author':
+        sort_key = Book.author
+    elif sort_column == 'rating':
+        sort_key = func.avg(Feedback.rating)
+    else:
+        # Default sorting
+        sort_key = Book.name
+
+    if sort_order == 'asc':
+        books_query = books_query.order_by(sort_key.asc())
+    else:
+        books_query = books_query.order_by(sort_key.desc())
+
+    books = books_query.all()
+    authors = db.session.query(Book.author).distinct().all()
+
+    return render_template('books/books.html', books=books, authors=authors)
+
 
 
 #view feedback
@@ -247,6 +272,7 @@ def view_borrowed_books_with_deadlines():
 
         books_with_deadlines.append({
             'user_book_id': user_book.id,
+            'book_id': book.id,  # Include the book_id here
             'book_name': book.name,
             'deadline': user_book.t_deadline.isoformat() if user_book.t_deadline else None,
             'days_until_deadline': days_until_deadline
@@ -254,6 +280,15 @@ def view_borrowed_books_with_deadlines():
 
     return render_template('users/books_with_deadlines.html', books_with_deadlines=books_with_deadlines)
 
+#bookview
+@app.route('/books/view/<int:book_id>', methods=['GET'])
+def view_book(book_id):
+    book = Book.query.get(book_id)
+    if not book:
+        flash('Book not found', 'error')
+        return redirect(url_for('view_borrowed_books_with_deadlines'))
+
+    return render_template('books/view_book.html', book=book)
 
 @app.route('/requested_books')
 def requested_books():
@@ -449,20 +484,7 @@ def manage():
                 return 'Section updated successfully', 200
             else:
                 return 'Section not found', 404
-        elif action == 'change_book_section':
-            for key, value in request.form.items():
-                if key.startswith('new_section_id_'):
-                    book_id = key.replace('new_section_id_', '')
-                    new_section_id = value
-
-                    book = Book.query.get(book_id)
-                    if book:
-                        book.section_id = new_section_id
-                        db.session.commit()
-
-            # Redirect to avoid resubmission on refresh
-            return redirect(url_for('manage'))
-
+        
         elif action == 'search_books':
             search_query = request.form.get('book_search')
 
@@ -470,11 +492,58 @@ def manage():
                 books = Book.query.filter(Book.name.ilike(f'%{search_query}%')).all()
             else:
                 books = []
-
             sections = Section.query.all()
-            return render_template('librarian/manage.html', sections=sections, books=books)
+            return render_template('librarian/manage.html',sections=sections, books=books)
     sections = Section.query.all()
     return render_template('librarian/manage.html',sections=sections)
+
+
+from flask import Flask, render_template, request, redirect, url_for
+from sqlalchemy.exc import IntegrityError
+
+@app.route('/manage/edit_book/<int:book_id>', methods=['GET', 'POST'])
+def edit_or_delete_book(book_id):
+    book = Book.query.get(book_id)
+    sections = Section.query.all()
+
+    if not book:
+        return 'Book not found', 404
+
+    if request.method == 'POST':
+        action = request.form.get('action')
+
+        if action == 'edit_book':
+            name = request.form.get('name')
+            content = request.form.get('content')
+            author = request.form.get('author')
+            section_id = request.form.get('section_id')
+
+            if not all([name, content, author, section_id]):
+                return 'Missing data', 400
+
+            try:
+                book.name = name
+                book.content = content
+                book.author = author
+                book.section_id = section_id
+                db.session.commit()
+                return 'Book updated successfully', 200
+            except IntegrityError:
+                db.session.rollback()
+                return 'Error updating book', 500
+
+        elif action == 'delete_book':
+            try:
+                db.session.delete(book)
+                db.session.commit()
+                return 'Book deleted successfully', 200
+            except:
+                db.session.rollback()
+                return 'Error deleting book', 500
+
+    return render_template('books/edit_books.html', book=book, sections=sections)
+
+
 
 
 @app.route('/user', methods=['GET'])

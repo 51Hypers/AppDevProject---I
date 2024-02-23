@@ -5,9 +5,27 @@
     <title>Books List</title>
     <link rel="stylesheet" href="path_to_your_stylesheet.css" />
   </head>
-  <body>
+  <body onload="setSortBy()">
+    {% include 'dashboards/usernav.html' %}
     <div class="container">
       <h1>Books List</h1>
+
+      <form action="{{ url_for('list_all_books') }}" method="GET">
+        <label for="sort_by">Sort By:</label>
+        <select name="sort_by" id="sort_by">
+          <option value="name_asc">Alphabetically by Book Name (A-Z)</option>
+          <option value="name_desc">Alphabetically by Book Name (Z-A)</option>
+          <option value="author_asc">
+            Alphabetically by Author Name (A-Z)
+          </option>
+          <option value="author_desc">
+            Alphabetically by Author Name (Z-A)
+          </option>
+          <option value="rating_desc">Highest to Lowest Rating</option>
+          <option value="rating_asc">Lowest to Highest Rating</option>
+        </select>
+        <button type="submit">Sort</button>
+      </form>
 
       <section class="books">
         <h2>Books</h2>
@@ -49,5 +67,15 @@
         </table>
       </section>
     </div>
+
+    <script>
+      function setSortBy() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const sortBy = urlParams.get('sort_by');
+        if (sortBy) {
+          document.getElementById('sort_by').value = sortBy;
+        }
+      }
+    </script>
   </body>
 </html>

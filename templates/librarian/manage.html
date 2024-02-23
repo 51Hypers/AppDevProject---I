@@ -4,6 +4,7 @@
     <title>Library Management</title>
   </head>
   <body>
+    {% include 'dashboards/navbar.html' %}
     <h1>Add Books</h1>
     <form method="POST" action="/manage">
       <input type="hidden" name="action" value="add_book" />
@@ -48,7 +49,7 @@
       <input type="submit" value="Edit Section" />
     </form>
 
-    <h1>Search Books</h1>
+    <h1>Search n Destroy Books</h1>
     <form method="POST" action="/manage">
       <input type="hidden" name="action" value="search_books" />
       <label for="book_search">Search for Book:</label><br />
@@ -69,15 +70,14 @@
             name="book_id_{{ book.id }}"
             value="{{ book.id }}"
           />
-          <select name="new_section_id_{{ book.id }}">
-            {% for section in sections %}
-            <option value="{{ section.id }}">{{ section.name }}</option>
-            {% endfor %}
-          </select>
+          <a
+            href="{{ url_for('edit_or_delete_book', book_id=book.id) }}"
+            class="btn waves-effect waves-light"
+            >Edit</a
+          >
         </li>
         {% endfor %}
       </ul>
-      <input type="submit" value="Update Sections" />
     </form>
     {% endif %}
   </body>

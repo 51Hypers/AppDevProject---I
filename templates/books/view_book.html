@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ book.name }}</title>
+</head>
+<body>
+    <h1>{{ book.name }}</h1>
+    <p>Author: {{ book.author }}</p>
+    <p>{{ book.content }}</p>
+    <a href="{{ url_for('view_borrowed_books_with_deadlines') }}">Back to Books with Deadlines</a>
+</body>
+</html>

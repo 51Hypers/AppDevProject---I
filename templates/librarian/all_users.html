@@ -1,38 +1,42 @@
 <!-- templates/librarian/all_users.html -->
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>All Users</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
     <!-- Add any additional CSS files or external stylesheets here -->
-</head>
-<body>
+  </head>
+  <body>
+    {% include 'dashboards/navbar.html' %}
     <h1>List of Users</h1>
     <table>
-        <thead>
-            <tr>
-                <th>User ID</th>
-                <th>Username</th>
-                <th>Email</th>
-                <!-- Add more columns as needed -->
-            </tr>
-        </thead>
-        <tbody>
-            {% for user in users %}
-                <tr>
-                    <td>{{ user.id }}</td>
-                    <td>{{ user.username }}</td>
-                    <td>{{ user.email }}</td>
-                    <!-- Display more user attributes as needed -->
-                </tr>
-            {% else %}
-                <tr>
-                    <td colspan="3">No users found.</td>
-                </tr>
-            {% endfor %}
-        </tbody>
+      <thead>
+        <tr>
+          <th>User ID</th>
+          <th>Username</th>
+          <th>Email</th>
+          <!-- Add more columns as needed -->
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr>
+          <td>{{ user.id }}</td>
+          <td>{{ user.username }}</td>
+          <td>{{ user.email }}</td>
+          <!-- Display more user attributes as needed -->
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="3">No users found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
     </table>
-</body>
+  </body>
 </html>

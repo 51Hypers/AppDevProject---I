@@ -58,6 +58,7 @@
     </style>
   </head>
   <body>
+    {% include 'dashboards/usernav.html' %}
     <div class="container">
       <h2 class="text-center my-4">User Dashboard</h2>
       <div class="dashboard-container">
@@ -97,7 +98,7 @@
 
             <!-- Deadlines -->
             <div class="deadlines">
-              <h4>Deadline</h4>
+              <h4>Borrowed Books and Upcoming Deadlines</h4>
               <ul>
                 {% for user_book, book in upcoming_deadlines %}
                 <li>
@@ -108,7 +109,7 @@
               </ul>
 
               <a href="{{ url_for('view_borrowed_books_with_deadlines') }}"
-                >View All Deadlines</a
+                >View Borrowed Books</a
               >
             </div>
 
@@ -147,8 +148,6 @@
           </div>
         </div>
       </div>
-      <h1>Logout</h1>
-      <a href="{{ url_for('logout') }}">Logout</a>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>

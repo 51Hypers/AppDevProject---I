@@ -5,6 +5,7 @@
     <title>Give Feedback</title>
 </head>
 <body>
+    {% include 'dashboards/usernav.html' %}
     <h1>Give Feedback</h1>
     <form action="{{ url_for('submit_feedback') }}" method="POST">
         <input type="hidden" name="book_id" value="{{ book_id }}">
