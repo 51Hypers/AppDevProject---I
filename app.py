@@ -107,7 +107,7 @@ def user_dashboard():
         flash('Please login to view your dashboard.', 'error')
         return redirect(url_for('login'))
 
-    borrowed_books = db.session.query(UserBook, Book).join(Book, UserBook.book_id == Book.id).filter(UserBook.user_id == user_id, UserBook.t_return == None, UserBook.is_approved == True).all()
+    borrowed_books = db.session.query(UserBook, Book).join(Book, UserBook.book_id == Book.id).filter(UserBook.user_id == user_id, UserBook.t_return == None,(UserBook.is_revoked == False) | (UserBook.is_revoked == None), UserBook.is_approved == True).all()
     now = datetime.utcnow()
     books_revoked = False
     deadline_warning_issued = False
@@ -258,7 +258,7 @@ def view_borrowed_books_with_deadlines():
 
     borrowed_books = db.session.query(UserBook, Book) \
         .join(Book, UserBook.book_id == Book.id) \
-        .filter(UserBook.user_id == user_id, UserBook.is_approved == True, UserBook.t_return == None) \
+        .filter(UserBook.user_id == user_id, UserBook.is_approved == True, UserBook.t_return == None, (UserBook.is_revoked == False) | (UserBook.is_revoked == None)) \
         .order_by(UserBook.t_deadline.asc()) \
         .all()
 
@@ -571,7 +571,7 @@ def view_users_details():
 
 @app.route('/requests', methods=['GET'])
 def list_all_requests():
-    unapproved_requests = db.session.query(UserBook).join(Book, Book.id == UserBook.book_id).join(User, User.id == UserBook.user_id).filter(UserBook.is_approved == False, UserBook.is_rejected == False).all()
+    unapproved_requests = db.session.query(UserBook).join(Book, Book.id == UserBook.book_id).join(User, User.id == UserBook.user_id).filter(UserBook.is_approved == False, UserBook.is_rejected == False,UserBook.is_returned==None).all()
     rejected_requests = db.session.query(UserBook).join(Book, Book.id == UserBook.book_id).join(User, User.id == UserBook.user_id).filter(UserBook.is_rejected == True).all()
     return render_template('librarian/requests.html', unapproved_requests=unapproved_requests, rejected_requests=rejected_requests)
 
@@ -579,10 +579,25 @@ def list_all_requests():
 @app.route('/stats')
 def get_books_stats():
     requested_books = UserBook.query.filter_by(is_approved=False, is_rejected=False, t_return=None, t_deadline=None).all()
-    borrowed_books = UserBook.query.filter_by(is_approved=True, is_rejected=False).all()
+    borrowed_books = UserBook.query.filter(
+        UserBook.is_approved == True,
+        UserBook.is_rejected == False,
+        (UserBook.is_revoked == False) | (UserBook.is_revoked == None)
+    ).all()
+    revoked_books = UserBook.query.filter_by(is_revoked=True).all()
     all_books = Book.query.all()
 
-    return render_template('librarian/book_stats.html', requested_books=requested_books, borrowed_books=borrowed_books, all_books=all_books, Book=Book)
+    return render_template('librarian/book_stats.html', requested_books=requested_books, borrowed_books=borrowed_books, revoked_books=revoked_books, all_books=all_books, Book=Book)
+
+
+#revoke
+@app.route('/revoke_book/<int:userbook_id>', methods=['POST'])
+def revoke_book(userbook_id):
+    userbook = UserBook.query.get(userbook_id)
+    userbook.is_revoked = True
+    db.session.commit()
+    flash('Book revoked successfully', 'success')  # Optionally, provide a notification
+    return redirect(url_for('get_books_stats'))
 
 
 @app.route('/request/<action>', methods=['POST'])

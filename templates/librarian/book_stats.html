@@ -1,3 +1,5 @@
+<!-- book_stats.html -->
+
 <!DOCTYPE html>
 <html>
   <head>
@@ -26,8 +28,27 @@
       <li>
         <strong>User:</strong> {{ userbook.user.username }},
         <strong>Book:</strong> {{ book.name }}, <strong>Deadline:</strong> {{
-        userbook.t_deadline.strftime('%Y-%m-%d') if userbook.t_deadline else 'None'
-        }}
+        userbook.t_deadline.strftime('%Y-%m-%d') if userbook.t_deadline else
+        'None' }} {% if not userbook.is_revoked %}
+        <form
+          action="{{ url_for('revoke_book', userbook_id=userbook.id) }}"
+          method="POST"
+        >
+          <button type="submit">Revoke</button>
+        </form>
+        {% else %}
+        <span>Revoked</span>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    <h2>Revoked Books:</h2>
+    <ul>
+      {% for userbook in revoked_books %} {% set book =
+      Book.query.get(userbook.book_id) %}
+      <li>
+        <strong>User:</strong> {{ userbook.user.username }},
+        <strong>Book:</strong> {{ book.name }}
       </li>
       {% endfor %}
     </ul>

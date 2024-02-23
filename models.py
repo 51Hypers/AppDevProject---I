@@ -84,7 +84,6 @@ class Section(db.Model):
         self.name = name
         self.desc = desc
 
-
 class UserBook(db.Model):
     __tablename__ = "userbook"
     id = Column(Integer, primary_key=True)
@@ -95,9 +94,10 @@ class UserBook(db.Model):
     t_deadline = Column(DateTime, nullable=True)
     is_approved = Column(Boolean, default=False)
     is_rejected = Column(Boolean, default=False)
-    
+    is_revoked = Column(Boolean, default=False)  # New column for revoking access
+
     def __init__(
-            self, id: int = None, user_id: int = None, book_id: int = None, t_request: datetime = None, t_return: datetime = None, is_approved: bool = None, is_rejected: bool = None
+            self, id: int = None, user_id: int = None, book_id: int = None, t_request: datetime = None, t_return: datetime = None, is_approved: bool = None, is_rejected: bool = None, is_revoked: bool = None
     ) -> None:
         self.id = id
         self.user_id = user_id
@@ -106,6 +106,7 @@ class UserBook(db.Model):
         self.t_return = t_return
         self.is_approved = is_approved
         self.is_rejected = is_rejected
+        self.is_revoked = is_revoked
 
     def is_returned(self):
         return self.t_return is not None
@@ -149,3 +150,5 @@ class Feedback(db.Model):
 
     user = db.relationship('User')
     book = db.relationship('Book')
+
+
