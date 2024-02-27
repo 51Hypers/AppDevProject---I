@@ -1,63 +1,129 @@
-<!-- book_stats.html -->
-
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Book Statistics</title>
-    <!-- Add any necessary CSS or meta tags here -->
-  </head>
-  <body>
-    {% include 'dashboards/navbar.html' %}
-    <h1>Book Statistics</h1>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book Statistics</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body {
+      color: #fff;
+      background-color: #343a40; /* Dark gray background */
+    }
+    .dashboard-container {
+      display: flex;
+      flex-direction: column;
+      margin-top: 20px;
+    }
+    .stats-section {
+      background-color: #580000; /* Maroon background */
+      margin: 10px 0;
+      padding: 20px;
+      border-radius: 8px;
+      transition: transform 0.2s; /* Animation effect */
+    }
+    .stats-section:hover {
+      transform: scale(1.02); /* Slight scale on hover */
+    }
+    .list-group-item {
+      background-color: #343a40; /* Matching the body background */
+      border: 1px solid #555; /* Adding a slight border for definition */
+      transition: background-color 0.2s ease; /* Smooth transition for hover effect */
+    }
+    .list-group-item:hover {
+      background-color: #40474e; /* Slightly lighter on hover */
+    }
+    h1, h2 {
+      font-weight: 700; /* Make headings bolder */
+      text-shadow: 1px 1px 2px #000; /* Soft shadow for depth */
+    }
+    .container {
+      max-width: 960px; /* Adjust container width for better alignment */
+    }
+    .btn-revoke {
+      background-color: #900;
+      color: #fff;
+      border: none;
+      transition: background-color 0.2s ease;
+    }
+    .btn-revoke:hover {
+      background-color: #a00;
+    }
+  </style>
+</head>
+<body>
+  {% include 'dashboards/navbar.html' %}
+  <div class="container dashboard-container">
+    <div class="text-center my-4" style="background-color: #580000; padding: 10px; border-radius: 8px;">
+      <h1>Book Statistics</h1>
+    </div>
 
-    <h2>Requested Books:</h2>
-    <ul>
-      {% for userbook in requested_books %} {% set book =
-      Book.query.get(userbook.book_id) %}
-      <li>
-        <strong>User:</strong> {{ userbook.user.username }},
-        <strong>Book:</strong> {{ book.name }}
-      </li>
-      {% endfor %}
-    </ul>
+    <div class="stats-section">
+      <h2>Requested Books</h2>
+      <ul class="list-group">
+        {% for userbook in requested_books %}
+        {% set book = Book.query.get(userbook.book_id) %}
+        <li class="list-group-item">
+          <strong>User:</strong> {{ userbook.user.username }} <br>
+          <strong>Book:</strong> {{ book.name }},
+          <strong>Book ID:</strong> {{ book.id }}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
 
-    <h2>Borrowed Books:</h2>
-    <ul>
-      {% for userbook in borrowed_books %} {% set book =
-      Book.query.get(userbook.book_id) %}
-      <li>
-        <strong>User:</strong> {{ userbook.user.username }},
-        <strong>Book:</strong> {{ book.name }}, <strong>Deadline:</strong> {{
-        userbook.t_deadline.strftime('%Y-%m-%d') if userbook.t_deadline else
-        'None' }} {% if not userbook.is_revoked %}
-        <form
-          action="{{ url_for('revoke_book', userbook_id=userbook.id) }}"
-          method="POST"
-        >
-          <button type="submit">Revoke</button>
-        </form>
-        {% else %}
-        <span>Revoked</span>
-        {% endif %}
-      </li>
-      {% endfor %}
-    </ul>
-    <h2>Revoked Books:</h2>
-    <ul>
-      {% for userbook in revoked_books %} {% set book =
-      Book.query.get(userbook.book_id) %}
-      <li>
-        <strong>User:</strong> {{ userbook.user.username }},
-        <strong>Book:</strong> {{ book.name }}
-      </li>
-      {% endfor %}
-    </ul>
+    <div class="stats-section">
+      <h2>Borrowed Books</h2>
+      <ul class="list-group">
+        {% for userbook in borrowed_books %}
+        {% set book = Book.query.get(userbook.book_id) %}
+        <li class="list-group-item">
+          <strong>User:</strong> {{ userbook.user.username }} <br>
+          <strong>Book ID:</strong> {{ book.id}}
+          <strong>Book:</strong> {{ book.name }},
+          <strong>Deadline:</strong> {{ userbook.t_deadline.strftime('%Y-%m-%d') if userbook.t_deadline else 'None' }}
+          {% if not userbook.is_revoked %}
+          <form action="{{ url_for('revoke_book', userbook_id=userbook.id) }}" method="POST">
+            <button type="submit" class="btn btn-revoke">Revoke</button>
+          </form>
+          {% else %}
+          <span>Revoked</span>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
 
-    <h2>All Books:</h2>
-    <ul>
-      {% for book in all_books %}
-      <li>{{ book.name }}</li>
-      {% endfor %}
-    </ul>
-  </body>
+    <div class="stats-section">
+      <h2>Revoked Books</h2>
+      <ul class="list-group">
+        {% for userbook in revoked_books %}
+        {% set book = Book.query.get(userbook.book_id) %}
+        <li class="list-group-item">
+          <strong>User:</strong> {{ userbook.user.username }} <br>
+          <strong>Book ID:</strong> {{ book.id }},
+          <strong>Book:</strong> {{ book.name }}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="stats-section">
+      <h2>All Books</h2>
+      <ul class="list-group">
+        {% for book in all_books %}
+        <li class="list-group-item">
+          <strong>Title:</strong> {{ book.name }} <br>
+          <strong>Book ID:</strong> {{ book.id }},
+          <strong>Author:</strong> {{ book.author}}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
 </html>

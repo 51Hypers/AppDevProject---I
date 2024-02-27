@@ -1,42 +1,91 @@
-<!-- templates/librarian/all_users.html -->
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>All Users</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/style.css') }}"
-    />
-    <!-- Add any additional CSS files or external stylesheets here -->
-  </head>
-  <body>
-    {% include 'dashboards/navbar.html' %}
-    <h1>List of Users</h1>
-    <table>
-      <thead>
-        <tr>
-          <th>User ID</th>
-          <th>Username</th>
-          <th>Email</th>
-          <!-- Add more columns as needed -->
-        </tr>
-      </thead>
-      <tbody>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>All Users</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body {
+      color: #fff;
+      background-color: #343a40; /* Dark gray background */
+    }
+    .dashboard-container {
+      display: flex;
+      flex-direction: column;
+      margin-top: 20px;
+    }
+    .stats-section {
+      background-color: #580000; /* Maroon background */
+      margin: 10px 0;
+      padding: 20px;
+      padding-top: 10px;
+      border-radius: 8px;
+      transition: transform 0.2s; /* Animation effect */
+    }
+    .stats-section:hover {
+      transform: scale(1.02); /* Slight scale on hover */
+    }
+    .list-group-item {
+      background-color: #343a40; /* Matching the body background */
+      border: 1px solid #555; /* Adding a slight border for definition */
+      transition: background-color 0.2s ease; /* Smooth transition for hover effect */
+      color: #fff; /* Ensure text is white for readability */
+      padding: 10px; /* Padding for spacing */
+      list-style-type: none; /* Remove bullet points */
+    }
+    .list-group-item:hover {
+      background-color: #40474e; /* Slightly lighter on hover */
+    }
+    h1 {
+    font-weight: 700; /* Make headings bolder */
+    text-shadow: 1px 1px 2px #000; /* Soft shadow for depth */
+    text-align: center; /* Centering the main heading */
+    color: #fff; /* White text color for visibility */
+    background-color: #580000; /* Maroon background for the heading */
+    padding: 10px; /* Padding for aesthetic spacing */
+    border-radius: 8px; /* Rounded corners for the heading */
+    margin: 20px 0 10px; /* Adjusted margin for spacing from the top */
+  }
+
+  h2 {
+    font-weight: 700; /* Keep headings bold */
+    text-shadow: 1px 1px 2px #000; /* Soft shadow for depth */
+    text-align: left; /* Align User Details to the left */
+    color: #fff; /* White text color for visibility */
+    background-color: #580000; /* Maroon background for subheading */
+    padding: 10px; /* Padding for aesthetic spacing */
+    border-radius: 8px; /* Rounded corners for the subheading */
+    margin-top: 10px 0; /* Reduce margin to bring closer to border */
+  }
+    .container {
+      max-width: 960px; /* Adjust container width for better alignment */
+    }
+  </style>  
+</head>
+<body>
+  {% include 'dashboards/navbar.html' %}
+  <div class="container dashboard-container">
+    <h1>All Users</h1>
+
+    <div class="stats-section">
+      <h2>User Details</h2>
+      <ul class="list-group">
         {% for user in users %}
-        <tr>
-          <td>{{ user.id }}</td>
-          <td>{{ user.username }}</td>
-          <td>{{ user.email }}</td>
-          <!-- Display more user attributes as needed -->
-        </tr>
+        <li class="list-group-item">
+          <strong>Username:</strong> {{ user.username }}<br>
+          <strong>ID:</strong> {{ user.id }},
+          <strong>Email:</strong> {{ user.email }}
+        </li>
         {% else %}
-        <tr>
-          <td colspan="3">No users found.</td>
-        </tr>
+        <li class="list-group-item">No users found.</li>
         {% endfor %}
-      </tbody>
-    </table>
-  </body>
+      </ul>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
 </html>
