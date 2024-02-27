@@ -5,9 +5,19 @@
     <title>Books List</title>
     <link rel="stylesheet" href="path_to_your_stylesheet.css" />
   </head>
+  <style>
+    .navbar {
+      left: 9% !important;
+    }
+
+    body {
+      background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
+      color: white;
+    }
+  </style>
   <body onload="setSortBy()">
     {% include 'dashboards/usernav.html' %}
-    <div class="container">
+    <div class="container" style="padding: 8rem 20rem">
       <h1>Books List</h1>
 
       <form action="{{ url_for('list_all_books') }}" method="GET">
@@ -27,9 +37,9 @@
         <button type="submit">Sort</button>
       </form>
 
-      <section class="books">
+      <section class="books" style="padding: 1rem 2rem">
         <h2>Books</h2>
-        <table>
+        <table style="width: 100%">
           <thead>
             <tr>
               <th>Title</th>
@@ -71,9 +81,9 @@
     <script>
       function setSortBy() {
         const urlParams = new URLSearchParams(window.location.search);
-        const sortBy = urlParams.get('sort_by');
+        const sortBy = urlParams.get("sort_by");
         if (sortBy) {
-          document.getElementById('sort_by').value = sortBy;
+          document.getElementById("sort_by").value = sortBy;
         }
       }
     </script>

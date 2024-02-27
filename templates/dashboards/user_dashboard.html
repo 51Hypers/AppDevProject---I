@@ -9,9 +9,16 @@
       rel="stylesheet"
     />
     <style>
+      @import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
       body {
+        font-family: "Roboto", sans-serif;
         color: #fff;
-        background-color: #343a40; /* Adjust background color */
+        background: linear-gradient(
+          to right,
+          #24243e,
+          #302b63,
+          #0f0c29
+        ); /* Adjust background color */
       }
       .dashboard-container {
         display: flex;
@@ -29,10 +36,10 @@
       .all-books,
       .all-sections,
       .search-books {
-        background-color: #580000; /* Maroon background */
+        background-color: #2f2b64; /* Maroon background */
         margin: 10px;
         padding: 20px;
-        border-radius: 5px;
+        border-radius: 12px;
       }
       .dashboard-right {
         display: flex;
@@ -42,24 +49,34 @@
         flex: 50%;
       }
       .btn-custom {
-        background-color: #900;
+        background-color: #484282;
         color: #fff;
         border: none;
+        padding: 0.5rem 1rem;
       }
       .btn-custom:hover {
-        background-color: #a00;
+        background-color: #4c459f;
+        color: white;
+        box-shadow: 0 12px 56px 0 rgba(0, 0, 0, 0.24),
+          0 17px 50px 0 rgba(0, 0, 0, 0.19);
       }
       .form-custom {
         margin-top: 20px;
       }
-      input[type='text'] {
+      input[type="text"] {
         margin-bottom: 10px;
+      }
+
+      .stats,
+      .all-books {
+        box-shadow: rgb(35, 33, 89) -11px 8px 24px;
+        margin-bottom: 5rem;
       }
     </style>
   </head>
   <body>
     {% include 'dashboards/usernav.html' %}
-    <div class="container">
+    <div class="container" style="padding-top: 6rem">
       <h2 class="text-center my-4">User Dashboard</h2>
       <div class="dashboard-container">
         <div class="dashboard-left">
@@ -151,35 +168,35 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-      fetch('/api/sections_of_interest_chart')
+      fetch("/api/sections_of_interest_chart")
         .then((response) => response.json())
         .then((data) => {
-          const canvas = document.getElementById('sectionPieChart');
-          const ctx = canvas.getContext('2d');
+          const canvas = document.getElementById("sectionPieChart");
+          const ctx = canvas.getContext("2d");
 
           const labels = Object.keys(data);
           const values = Object.values(data);
 
           const backgroundColors = [
-            'rgba(255, 99, 132, 0.7)',
-            'rgba(54, 162, 235, 0.7)',
-            'rgba(255, 206, 86, 0.7)',
-            'rgba(75, 192, 192, 0.7)',
-            'rgba(153, 102, 255, 0.7)',
-            'rgba(255, 159, 64, 0.7)',
+            "rgba(255, 99, 132, 0.7)",
+            "rgba(54, 162, 235, 0.7)",
+            "rgba(255, 206, 86, 0.7)",
+            "rgba(75, 192, 192, 0.7)",
+            "rgba(153, 102, 255, 0.7)",
+            "rgba(255, 159, 64, 0.7)",
           ];
 
           const hoverBackgroundColors = [
-            'rgba(255, 99, 132, 1)',
-            'rgba(54, 162, 235, 1)',
-            'rgba(255, 206, 86, 1)',
-            'rgba(75, 192, 192, 1)',
-            'rgba(153, 102, 255, 1)',
-            'rgba(255, 159, 64, 1)',
+            "rgba(255, 99, 132, 1)",
+            "rgba(54, 162, 235, 1)",
+            "rgba(255, 206, 86, 1)",
+            "rgba(75, 192, 192, 1)",
+            "rgba(153, 102, 255, 1)",
+            "rgba(255, 159, 64, 1)",
           ];
 
           new Chart(ctx, {
-            type: 'pie',
+            type: "pie",
             data: {
               labels: labels,
               datasets: [
@@ -195,7 +212,7 @@
               maintainAspectRatio: false,
               title: {
                 display: true,
-                text: 'Books Read from Each Section',
+                text: "Books Read from Each Section",
               },
             },
           });
