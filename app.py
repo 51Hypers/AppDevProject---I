@@ -650,12 +650,12 @@ def add_section():
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
     if request.method == 'GET':
-        return render_template('admin_login.html')  # Admin login form
+        return render_template('admin/admin_login.html')  # Admin login form
     else:
         password = request.form['password']
         if password == '1':  # Replace 'your_admin_password' with your actual admin password
             librarian_requests = LibrarianRequest.query.all()
-            return render_template('admin_panel.html', librarian_requests=librarian_requests)
+            return render_template('admin/admin_panel.html', librarian_requests=librarian_requests)
         else:
             return render_template('admin/admin_login.html', error='Invalid password')
 

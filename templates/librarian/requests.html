@@ -82,8 +82,14 @@
               <td>{{ request.book.name }}</td>
               <td>{{ request.t_request.strftime('%Y-%m-%d %H:%M:%S') }}</td>
               <td class="form-actions">
-                <button type="button" class="btn btn-primary">Approve</button>
-                <button type="button" class="btn btn-danger">Reject</button>
+                <form action="{{ url_for('approve_book_request', action='approve') }}" method="POST" style="display: inline;">
+                  <input type="hidden" name="userbook_id" value="{{ request.id }}">
+                  <button type="submit" class="btn btn-primary">Approve</button>
+                </form>
+                <form action="{{ url_for('approve_book_request', action='reject') }}" method="POST" style="display: inline;">
+                  <input type="hidden" name="userbook_id" value="{{ request.id }}">
+                  <button type="submit" class="btn btn-danger">Reject</button>
+                </form>
               </td>
             </tr>
             {% endfor %}
