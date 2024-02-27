@@ -1,0 +1,30 @@
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+ul {
+  display: flex;
+  flex-direction: row;
+  list-style: none;
+  padding: 0;
+  margin: 3rem 0;
+  gap: 10px;
+}
+
+a {
+  background-color: red;
+  padding: 1rem 1.5rem;
+  border-radius: 15px;
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+  transition: 0.3s ease all;
+}
+
+a:hover {
+  background-color: #ff4d4d;
+  padding: 1.2rem 1.7rem;
+}
