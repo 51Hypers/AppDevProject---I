@@ -571,7 +571,7 @@ def view_users_details():
 
 @app.route('/requests', methods=['GET'])
 def list_all_requests():
-    unapproved_requests = db.session.query(UserBook).join(Book, Book.id == UserBook.book_id).join(User, User.id == UserBook.user_id).filter(UserBook.is_approved == False, UserBook.is_rejected == False,UserBook.is_returned==None).all()
+    unapproved_requests = db.session.query(UserBook).join(Book, Book.id == UserBook.book_id).join(User, User.id == UserBook.user_id).filter(UserBook.is_approved == False, UserBook.is_rejected == False,UserBook.t_return==None).all()
     rejected_requests = db.session.query(UserBook).join(Book, Book.id == UserBook.book_id).join(User, User.id == UserBook.user_id).filter(UserBook.is_rejected == True).all()
     return render_template('librarian/requests.html', unapproved_requests=unapproved_requests, rejected_requests=rejected_requests)
 

@@ -2,83 +2,245 @@
 <html>
   <head>
     <title>Library Management</title>
+    <style>
+      body {
+  background-color: #343a40;
+  color: #333;
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+section {
+  background-color: #580000;
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 800px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  color: #fff;
+}
+
+h1 {
+  text-align: center; /* Centered headings */
+  margin-bottom: 30px; /* Space below headings */
+}
+
+label {
+  display: block; /* Labels are block level for better structure */
+  margin-top: 10px; /* Margin on top for spacing */
+}
+
+input[type="text"],
+textarea,
+select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border: none;
+  border-radius: 4px;
+  background-color: #343a40; /* Match section background */
+  color: #fff; /* Ensure text is visible */
+}
+
+input[type="submit"] {
+  background-color: #900;
+  color: #fff;
+  border: none;
+  transition: background-color 0.2s ease, transform 0.2s ease; /* Added transform to transition */
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: block;
+  margin: 20px auto;
+  text-transform: uppercase;
+}
+
+input[type="submit"]:hover {
+  background-color: #444;
+  transform: scale(1.05); /* Scale effect on hover */
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  background: #fff;
+  color: #333;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease, transform 0.2s ease; /* Added transition for transform */
+}
+
+li:hover {
+  transform: scale(1.05); /* Scale effect on hover */
+}
+
+body {
+            color: #fff;
+            background-color: #343a40; /* Dark gray background */
+        }
+        h1, h2 {
+            font-size: 2.5em; /* Bigger heading size */
+            font-weight: 700; /* Make headings bolder */
+            color: white;
+            text-shadow: 1px 1px 2px #000; /* Soft shadow for depth */
+            margin-bottom: 0.5em;
+        }
+        .dashboard-container {
+            display: flex;
+            flex-direction: column;
+            margin-top: 20px;
+        }
+        .container {
+            max-width: 960px; /* Adjust container width for better alignment */
+            margin: auto;
+            padding: 0 20px;
+        }
+        .section {
+            background-color: #ffffff21; /* Slightly transparent white for inner sections */
+            margin: 10px 0;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .stats-section:hover, .section:hover {
+            transform: scale(1.02); /* Slight scale on hover */
+        }
+        .list-group-item {
+            background-color: #343a40; /* Matching the body background */
+            border: 1px solid #555; /* Adding a slight border for definition */
+            transition: background-color 0.2s ease; /* Smooth transition for hover effect */
+        }
+        .list-group-item:hover {
+            background-color: #40474e; /* Slightly lighter on hover */
+        }
+        .maroon-background {
+            background-color: #580000; /* Maroon background */
+        }
+        .book-list {
+        list-style: none;
+        padding: 0;
+    }
+    .book-item {
+        background-color: #580000; /* Maroon background for each book item */
+        margin: 10px 0;
+        padding: 15px;
+        border-radius: 8px;
+        transition: transform 0.2s; /* Animation effect */
+    }
+    .book-item:hover {
+        transform: scale(1.02); /* Slight scale on hover */
+    }
+    .book-info {
+        color: #fff;
+        margin-bottom: 10px; /* Spacing between the book info and the button */
+    }
+    .edit-btn {
+        /* Styling for the edit button */
+        background-color: #900; /* Darker grey background */
+        color: #fff;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+    .edit-btn:hover {
+        background-color: #505c66; /* Lighter grey on hover */
+    }
+
+  </style>
   </head>
   <body>
     {% include 'dashboards/navbar.html' %}
-    <h1>Add Books</h1>
-    <form method="POST" action="/manage">
-      <input type="hidden" name="action" value="add_book" />
-      <label for="name">Name:</label><br />
-      <input type="text" id="name" name="name" /><br />
-      <label for="content">Content:</label><br />
-      <textarea id="content" name="content"></textarea><br />
-      <label for="author">Author:</label><br />
-      <input type="text" id="author" name="author" /><br />
-      <label for="section_id">Section:</label><br />
-      <select id="section_id" name="section_id">
-        {% for section in sections %}
-        <option value="{{ section.id }}">{{ section.name }}</option>
-        {% endfor %}</select
-      ><br />
-      <input type="submit" value="Add Book" />
-    </form>
+    <div class="container dashboard-container"></div>
+    <section id="add-books">
+      <h1>Add Books</h1>
+      <form method="POST" action="/manage">
+        <input type="hidden" name="action" value="add_book" />
+        <label for="name">Name:</label><br />
+        <input type="text" id="name" name="name" /><br />
+        <label for="content">Content:</label><br />
+        <textarea id="content" name="content"></textarea><br />
+        <label for="author">Author:</label><br />
+        <input type="text" id="author" name="author" /><br />
+        <label for="section_id">Section:</label><br />
+        <select id="section_id" name="section_id">
+          {% for section in sections %}
+          <option value="{{ section.id }}">{{ section.name }}</option>
+          {% endfor %}</select
+        ><br />
+        <input type="submit" value="Add Book" />
+      </form>
+    </section>
 
-    <h1>Add Sections</h1>
-    <form method="POST" action="/manage">
-      <input type="hidden" name="action" value="add_section" />
-      <label for="section_name">Section Name:</label><br />
-      <input type="text" id="section_name" name="section_name" /><br />
-      <label for="section_desc">Section Description:</label><br />
-      <textarea id="section_desc" name="section_desc"></textarea><br />
-      <input type="submit" value="Add Section" />
-    </form>
+    <section id="add-sections">
+      <h1>Add Sections</h1>
+      <form method="POST" action="/manage">
+        <input type="hidden" name="action" value="add_section" />
+        <label for="section_name">Section Name:</label><br />
+        <input type="text" id="section_name" name="section_name" /><br />
+        <label for="section_desc">Section Description:</label><br />
+        <textarea id="section_desc" name="section_desc"></textarea><br />
+        <input type="submit" value="Add Section" />
+      </form>
+    </section>
 
-    <h1>Edit Sections</h1>
-    <form method="POST" action="/manage">
-      <input type="hidden" name="action" value="edit_section" />
-      <label for="section_id_edit">Select Section to Edit:</label><br />
-      <select id="section_id_edit" name="section_id">
-        {% for section in sections %}
-        <option value="{{ section.id }}">{{ section.name }}</option>
-        {% endfor %}</select
-      ><br />
-      <label for="new_name">New Name:</label><br />
-      <input type="text" id="new_name" name="new_name" /><br />
-      <label for="new_desc">New Description:</label><br />
-      <textarea id="new_desc" name="new_desc"></textarea><br />
-      <input type="submit" value="Edit Section" />
-    </form>
+    <section id="edit-sections">
+      <h1>Edit Sections</h1>
+      <form method="POST" action="/manage">
+        <input type="hidden" name="action" value="edit_section" />
+        <label for="section_id_edit">Select Section to Edit:</label><br />
+        <select id="section_id_edit" name="section_id">
+          {% for section in sections %}
+          <option value="{{ section.id }}">{{ section.name }}</option>
+          {% endfor %}</select
+        ><br />
+        <label for="new_name">New Name:</label><br />
+        <input type="text" id="new_name" name="new_name" /><br />
+        <label for="new_desc">New Description:</label><br />
+        <textarea id="new_desc" name="new_desc"></textarea><br />
+        <input type="submit" value="Edit Section" />
+      </form>
+    </section>
 
-    <h1>Search n Destroy Books</h1>
-    <form method="POST" action="/manage">
-      <input type="hidden" name="action" value="search_books" />
-      <label for="book_search">Search for Book:</label><br />
-      <input type="text" id="book_search" name="book_search" /><br />
-      <input type="submit" value="Search" />
-    </form>
+    <section id="search-destroy-books">
+      <h1>Search n Destroy Books</h1>
+      <form method="POST" action="/manage">
+        <input type="hidden" name="action" value="search_books" />
+        <label for="book_search">Search for Book:</label><br />
+        <input type="text" id="book_search" name="book_search" /><br />
+        <input type="submit" value="Search" />
+      </form>
+  </section>
 
     {% if books %}
     <h2>Search Results:</h2>
     <form method="POST" action="/manage">
       <input type="hidden" name="action" value="change_book_section" />
-      <ul>
-        {% for book in books %}
-        <li>
-          {{ book.name }} - {{ book.author }} - Section: {{ book.section.name }}
-          <input
-            type="hidden"
-            name="book_id_{{ book.id }}"
-            value="{{ book.id }}"
-          />
-          <a
-            href="{{ url_for('edit_or_delete_book', book_id=book.id) }}"
-            class="btn waves-effect waves-light"
-            >Edit</a
-          >
-        </li>
-        {% endfor %}
+      <ul class="book-list">
+          {% for book in books %}
+          <li class="book-item">
+              <div class="book-info">
+                  {{ book.name }} - {{ book.author }} - Section: {{ book.section.name }}
+              </div>
+              <input
+                  type="hidden"
+                  name="book_id_{{ book.id }}"
+                  value="{{ book.id }}"
+              />
+              <a
+                  href="{{ url_for('edit_or_delete_book', book_id=book.id) }}"
+                  class="edit-btn"
+              >Edit</a>
+          </li>
+          {% endfor %}
       </ul>
-    </form>
+  </form>
     {% endif %}
+  </div>
   </body>
 </html>
