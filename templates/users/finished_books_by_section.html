@@ -16,6 +16,13 @@
       .navbar {
         left: 8% !important;
       }
+      .book-card {
+        padding: 1rem;
+        width: 35%;
+        background-color: #231f59;
+        border-radius: 15px;
+        height: 7rem;
+      }
     </style>
   </head>
   <body>
@@ -26,7 +33,7 @@
       books_by_section.items() %}
       <h2>Section: {{ section }}</h2>
       {% for item in books %}
-      <div>
+      <div class="book-card">
         <h3>{{ item.book.name }} by {{ item.book.author }}</h3>
         <p>Returned On: {{ item.user_book.t_return.strftime('%Y-%m-%d') }}</p>
       </div>

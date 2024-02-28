@@ -14,6 +14,62 @@
       background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
       color: white;
     }
+
+    .btn {
+      width: 7rem;
+      padding: 0.5rem;
+      color: white;
+      background-color: #484282;
+      border-radius: 5px;
+    }
+
+    .btn-a {
+      text-decoration: none;
+      color: white;
+      text-align: center;
+    }
+
+    .btn:hover {
+      background-color: #4c459f;
+      color: white;
+      box-shadow: 0 12px 56px 0 rgba(0, 0, 0, 0.24),
+        0 17px 50px 0 rgba(0, 0, 0, 0.19);
+    }
+
+    .btn-req {
+      margin-left: 25px;
+    }
+
+    .sort-btn {
+      padding: 0.6rem 1rem;
+      font-size: 90%;
+      color: white;
+      background-color: #484282;
+      border-radius: 5px;
+      border: transparent;
+      font-weight: 700F;
+    }
+
+    .sort-btn:hover {
+      background-color: #4c459f;
+      color: white;
+      box-shadow: 0 12px 56px 0 rgba(0, 0, 0, 0.24),
+        0 17px 50px 0 rgba(0, 0, 0, 0.19);
+    }
+
+    #sort_by {
+      padding: 0.5rem 1rem;
+      font-size: 90%;
+      background-color: #484282;
+      border-radius: 5px;
+      border: transparent;
+      color: white;
+      font-weight: 700;
+    }
+
+    .label-sort {
+      font-size: 1.2rem;
+    }
   </style>
   <body onload="setSortBy()">
     {% include 'dashboards/usernav.html' %}
@@ -21,7 +77,7 @@
       <h1>Books List</h1>
 
       <form action="{{ url_for('list_all_books') }}" method="GET">
-        <label for="sort_by">Sort By:</label>
+        <label for="sort_by" class="label-sort">Sort By:</label>
         <select name="sort_by" id="sort_by">
           <option value="name_asc">Alphabetically by Book Name (A-Z)</option>
           <option value="name_desc">Alphabetically by Book Name (Z-A)</option>
@@ -34,7 +90,7 @@
           <option value="rating_desc">Highest to Lowest Rating</option>
           <option value="rating_asc">Lowest to Highest Rating</option>
         </select>
-        <button type="submit">Sort</button>
+        <button type="submit" class="sort-btn">Sort</button>
       </form>
 
       <section class="books" style="padding: 1rem 2rem">
@@ -57,17 +113,17 @@
               <td>{{ book.author }}</td>
               <td>{{ section.name }}</td>
               <td>{{ average_rating }}</td>
-              <td>
+              <td class="btn">
                 <a
                   href="{{ url_for('request_book', book_id=book.id) }}"
-                  class="btn btn-primary"
+                  class="btn-a btn-req"
                   >Request</a
                 >
               </td>
-              <td>
+              <td class="btn">
                 <a
                   href="{{ url_for('view_feedback', book_id=book.id) }}"
-                  class="btn btn-secondary"
+                  class="btn-a btn-secondary"
                   >View Feedback</a
                 >
               </td>

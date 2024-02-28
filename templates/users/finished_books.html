@@ -5,26 +5,51 @@
     <title>Finished Reading</title>
     <style>
       body {
-          background: linear-gradient( to right, #24243e, #302b63, #0f0c29 );
-          color: white;
+        background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
+        color: white;
       }
 
       .container {
-          padding: 8rem 20rem;
+        padding: 8rem 20rem;
       }
       .navbar {
-          left: 8% !important;
+        left: 8% !important;
       }
-  </style>
+
+      .book-card {
+        padding: 1rem;
+        width: 35%;
+        background-color: #231f59;
+        border-radius: 15px;
+        height: 11rem;
+      }
+
+      .btn:hover {
+        background-color: #4c459f;
+        color: white;
+        box-shadow: 0 12px 56px 0 rgba(0, 0, 0, 0.24),
+          0 17px 50px 0 rgba(0, 0, 0, 0.19);
+      }
+
+      .btn {
+        padding: 0.5rem;
+        background-color: #484282;
+        text-decoration: navajowhite;
+        color: white;
+        border-radius: 5px;
+      }
+    </style>
   </head>
   <body>
     {% include 'dashboards/usernav.html' %}
     <div class="container">
       <h1>Books I've Finished Reading</h1>
       {% if finished_books %} {% for user_book, book in finished_books %}
-      <div>
+      <div class="book-card">
         <h2>{{ book.name }} by {{ book.author }}</h2>
-        <p>Returned On: {{ user_book.t_return.strftime('%Y-%m-%d') }}</p>
+        <p style="margin-bottom: 3rem">
+          Returned On: {{ user_book.t_return.strftime('%Y-%m-%d') }}
+        </p>
         <a
           href="{{ url_for('give_feedback', book_id=book.id) }}"
           class="btn btn-primary"
@@ -34,7 +59,6 @@
       {% endfor %} {% else %}
       <p>You have not finished any books.</p>
       {% endif %}
-
     </div>
   </body>
 </html>
