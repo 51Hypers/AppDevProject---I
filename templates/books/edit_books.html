@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Book</title>
     <style>
+        /* Your existing CSS styles */
         body {
             color: #fff;
             background-color: #343a40; /* Dark gray background */
@@ -38,9 +39,7 @@
             margin: 15px 0 5px;
             font-size: 1.2em; /* Bigger font size for labels */
         }
-        input[type=text],
-        textarea,
-        select {
+        input[type=text], input[type=file], textarea, select {
             width: 100%;
             padding: 8px;
             margin-bottom: 20px;
@@ -51,9 +50,7 @@
             color: #fff;
             transition: transform 0.3s ease; /* Transition effect for scaling */
         }
-        input[type=text]:hover,
-        textarea:hover,
-        select:hover {
+        input[type=text]:hover, input[type=file]:hover, textarea:hover, select:hover {
             transform: scale(1.03); /* Slightly increase size on hover */
         }
         input[type=submit] {
@@ -75,15 +72,17 @@
     {% include 'dashboards/navbar.html' %}
     <div class="container">
         <div class="maroon-tile">
-            <h1>Edit Book</h1>
+            <h1>Edit Book: {{ book.name }}</h1>
         </div>
-        <form method="POST">
+        <form method="POST" enctype="multipart/form-data">
             <input type="hidden" name="action" value="edit_book" />
             <label for="name">Name:</label>
             <input type="text" id="name" name="name" value="{{ book.name }}" required/><br />
             
-            <label for="content">Content:</label>
-            <textarea id="content" name="content" required>{{ book.content }}</textarea><br />
+            <label>Current PDF:</label>
+            <p>If available: <a href="{{ url_for('print_pdf', filename=book.content.replace('\\', '/')) }}" target="_blank">Open Book</a></p>
+            <label for="content">Update PDF Content:</label>
+            <input type="file" id="content" name="content"/><br />
             
             <label for="author">Author:</label>
             <input type="text" id="author" name="author" value="{{ book.author }}" required/><br />
@@ -91,7 +90,7 @@
             <label for="section_id">Section:</label>
             <select id="section_id" name="section_id">
                 {% for section in sections %}
-                    <option value="{{ section.id }}" {% if section.id == book.section_id %}selected{% endif %}>{{ section.name }}</option>
+                <option value="{{ section.id }}" {% if section.id == book.section_id %}selected{% endif %}>{{ section.name }}</option>
                 {% endfor %}
             </select><br />
             

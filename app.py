@@ -1,10 +1,11 @@
 import datetime
 from io import BytesIO
+import os
 import pandas as pd
 from matplotlib import pyplot as plt
 from sqlalchemy import Null, or_
 from nit import app, db
-from flask import render_template, render_template_string, request, redirect, send_file, url_for, session, flash
+from flask import abort, render_template, render_template_string, request, redirect, send_file, url_for, session, flash
 from models import User, Section, Book, UserBook, Feedback
 from sqlalchemy.orm.exc import NoResultFound
 from models import LibrarianRequest
@@ -15,7 +16,9 @@ from sqlalchemy import func
 # DECORATORS
 from flask import redirect, url_for, session
 from functools import wraps
-
+from werkzeug.utils import secure_filename
+ALLOWED_EXTENSIONS = {'pdf'}
+UPLOAD_FOLDER = 'static\pdfs'
 
 def login_required(f):
     @wraps(f)
@@ -438,21 +441,29 @@ def manage():
         action = request.form.get('action')
         if action == 'add_book':
             name = request.form.get('name')
-            content = request.form.get('content')
+            file = request.files['content']  # Adjusted to handle file
             author = request.form.get('author')
             section_id = request.form.get('section_id')
 
-            if not all([name, content, author, section_id]):
-                return 'Missing data', 400
+            if not all([name, author, section_id]) or file.filename == '':
+                flash('Missing data', 'error')
+                return redirect(request.url)
 
-            try:
-                book = Book(name=name, content=content, author=author, section_id=section_id)
-                db.session.add(book)
-                db.session.commit()
-                return 'Book added successfully', 201
-            except IntegrityError:
-                db.session.rollback()
-                return 'Section does not exist', 404
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(filepath)
+
+                try:
+                    book = Book(name=name, content=filepath, author=author, section_id=section_id)
+                    db.session.add(book)
+                    db.session.commit()
+                    flash('Book added successfully', 'success')
+                except IntegrityError:
+                    db.session.rollback()
+                    flash('Error adding book', 'error')
+            else:
+                flash('Invalid file format', 'error')
 
         elif action == 'add_section':
             name = request.form.get('section_name')
@@ -501,47 +512,47 @@ def manage():
 from flask import Flask, render_template, request, redirect, url_for
 from sqlalchemy.exc import IntegrityError
 
-@app.route('/manage/edit_book/<int:book_id>', methods=['GET', 'POST'])
-def edit_or_delete_book(book_id):
-    book = Book.query.get(book_id)
-    sections = Section.query.all()
+# @app.route('/manage/edit_book/<int:book_id>', methods=['GET', 'POST'])
+# def edit_or_delete_book(book_id):
+#     book = Book.query.get(book_id)
+#     sections = Section.query.all()
 
-    if not book:
-        return 'Book not found', 404
+#     if not book:
+#         return 'Book not found', 404
 
-    if request.method == 'POST':
-        action = request.form.get('action')
+#     if request.method == 'POST':
+#         action = request.form.get('action')
 
-        if action == 'edit_book':
-            name = request.form.get('name')
-            content = request.form.get('content')
-            author = request.form.get('author')
-            section_id = request.form.get('section_id')
+#         if action == 'edit_book':
+#             name = request.form.get('name')
+#             content = request.form.get('content')
+#             author = request.form.get('author')
+#             section_id = request.form.get('section_id')
 
-            if not all([name, content, author, section_id]):
-                return 'Missing data', 400
+#             if not all([name, content, author, section_id]):
+#                 return 'Missing data', 400
 
-            try:
-                book.name = name
-                book.content = content
-                book.author = author
-                book.section_id = section_id
-                db.session.commit()
-                return 'Book updated successfully', 200
-            except IntegrityError:
-                db.session.rollback()
-                return 'Error updating book', 500
+#             try:
+#                 book.name = name
+#                 book.content = content
+#                 book.author = author
+#                 book.section_id = section_id
+#                 db.session.commit()
+#                 return 'Book updated successfully', 200
+#             except IntegrityError:
+#                 db.session.rollback()
+#                 return 'Error updating book', 500
 
-        elif action == 'delete_book':
-            try:
-                db.session.delete(book)
-                db.session.commit()
-                return 'Book deleted successfully', 200
-            except:
-                db.session.rollback()
-                return 'Error deleting book', 500
+#         elif action == 'delete_book':
+#             try:
+#                 db.session.delete(book)
+#                 db.session.commit()
+#                 return 'Book deleted successfully', 200
+#             except:
+#                 db.session.rollback()
+#                 return 'Error deleting book', 500
 
-    return render_template('books/edit_books.html', book=book, sections=sections)
+#     return render_template('books/edit_books.html', book=book, sections=sections)
 
 
 
@@ -751,9 +762,84 @@ def submit_feedback():
     return 'Feedback submitted successfully'
 
 
+# <-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------> #
+#PDF Handling
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'pdf'}
+
+
+@app.route('/manage/edit_book/<int:book_id>', methods=['GET', 'POST'])
+def edit_or_delete_book(book_id):
+    book = Book.query.get(book_id)
+    sections = Section.query.all()
+
+    if not book:
+        flash('Book not found', 'error')
+        return redirect(url_for('your_book_listing_function'))  # Adjust to your book listing function
+
+    if request.method == 'POST':
+        action = request.form.get('action')
+
+        if action == 'edit_book':
+            name = request.form.get('name')
+            file = request.files.get('content')
+            author = request.form.get('author')
+            section_id = request.form.get('section_id')
+
+            # Validate input
+            if not all([name, author, section_id]) or not file or not allowed_file(file.filename):
+                flash('Missing data or file is not allowed', 'error')
+                return redirect(request.url)
+
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(filepath)
+                
+                # Update book content path instead of direct content
+                book.content = os.path.join('uploads', filename)
+
+            book.name = name
+            book.author = author
+            book.section_id = section_id
+            
+            try:
+                db.session.commit()
+                flash('Book updated successfully', 'success')
+            except:
+                db.session.rollback()
+                flash('Error updating book', 'error')
+
+        elif action == 'delete_book':
+            try:
+                db.session.delete(book)
+                db.session.commit()
+                flash('Book deleted successfully', 'success')
+            except:
+                db.session.rollback()
+                flash('Error deleting book', 'error')
+
+        return redirect(request.url)  # Redirect back to the same edit page
+
+    return render_template('books/edit_books.html', book=book, sections=sections)
 
 
 
+@app.route('/<path:filename>')
+def print_pdf(filename):
+    base_dir = os.path.join(app.root_path, 'static', 'pdfs')  # Base directory for PDFs
+
+    # Construct the absolute path
+    file_path = os.path.join(base_dir, filename.replace('%5C', '/').replace('\\', '/'))
+
+    try:
+        # Attempt to send the file; add_attachment=False to display instead of downloading
+        return send_file(file_path, as_attachment=False)
+    except FileNotFoundError:
+        abort(404)
+
+if __name__ == '__main__':
+    app.run(debug=True)
 
 
 

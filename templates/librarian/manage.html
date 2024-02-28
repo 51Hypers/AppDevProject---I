@@ -166,20 +166,21 @@ body {
     <div class="container dashboard-container"></div>
     <section id="add-books">
       <h1>Add Books</h1>
-      <form method="POST" action="/manage">
+      <form method="POST" action="/manage" enctype="multipart/form-data">
         <input type="hidden" name="action" value="add_book" />
         <label for="name">Name:</label><br />
-        <input type="text" id="name" name="name" /><br />
-        <label for="content">Content:</label><br />
-        <textarea id="content" name="content"></textarea><br />
+        <input type="text" id="name" name="name" required/><br />
+        <label for="content">PDF Content:</label><br />
+        <!-- Change to input type file for PDF upload -->
+        <input type="file" id="content" name="content" required/><br />
         <label for="author">Author:</label><br />
-        <input type="text" id="author" name="author" /><br />
+        <input type="text" id="author" name="author" required/><br />
         <label for="section_id">Section:</label><br />
-        <select id="section_id" name="section_id">
+        <select id="section_id" name="section_id" required>
           {% for section in sections %}
           <option value="{{ section.id }}">{{ section.name }}</option>
-          {% endfor %}</select
-        ><br />
+          {% endfor %}
+        </select><br />
         <input type="submit" value="Add Book" />
       </form>
     </section>

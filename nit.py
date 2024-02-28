@@ -4,10 +4,12 @@ from flask_migrate import Migrate
 from faker import Faker
 
 app = Flask(__name__)
+UPLOAD_FOLDER = 'static\pdfs'
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///library.db"
 app.config["SECRET_KEY"] = "427a3ec270bc25fe4e143d65f43f3f72"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config['UPLOAD_FOLDER'] = 'static\pdfs'
 
 db = SQLAlchemy(app=app)
 migrate = Migrate(app=app, db=db)
