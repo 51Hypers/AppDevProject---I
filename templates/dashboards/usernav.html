@@ -14,10 +14,11 @@
     padding: 1.5rem 8.5rem;
     position: fixed;
     left: 14%;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 100;
   }
 
   .navbar a {
@@ -57,7 +58,7 @@
 <div class="navbar">
   <a href="/dashboards/user_dashboard">Dashboard</a>
   <div class="books-dropdown">
-    <span style="cursor: pointer">Books </span>
+    <span style="cursor: pointer">Books &#9660;</span>
     <div class="menu">
       <a href="/books">Available Books</a>
       <a href="/books/deadlines">Borrowed Books</a>

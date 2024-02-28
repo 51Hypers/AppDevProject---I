@@ -6,6 +6,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Filtered Books</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <style>
+        body {
+            background: linear-gradient( to right, #24243e, #302b63, #0f0c29 );
+            color: white;
+        }
+
+        .container {
+            padding-top: 8rem;
+        }
+        .card {
+            background-color: #2f2b64;
+        }
+        .row {
+            margin-top: 1rem;
+        }
+
+        .select-wrapper > input{
+            color: white;
+        }
+        .btn {
+            background-color: #484282;
+        }
+
+        .btn:hover {
+            background-color: #4c459f ;
+        }
+        .card-action {
+            display: flex;
+            gap: 2rem;
+            justify-content: flex-start;
+        }
+    </style>
 </head>
 <body>
     {% include 'dashboards/usernav.html' %}

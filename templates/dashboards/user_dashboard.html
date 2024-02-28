@@ -72,6 +72,38 @@
         box-shadow: rgb(35, 33, 89) -11px 8px 24px;
         margin-bottom: 5rem;
       }
+
+      #filter_type {
+        background-color: #484282;
+        border: none;
+        padding: 0.5rem 1rem;
+        color: white;
+        border-radius: 0.2rem;
+        margin-right: 1rem;
+      }
+
+      .filterbtn {
+        background-color: #484282;
+        color: #fff;
+        border: none;
+        padding: 0.65rem 1rem;
+        border-radius: 0.2rem;
+        margin-left: 1rem;
+        transition: 0.2s ease-in-out all;
+      }
+
+      .filterbtn:hover {
+        background-color: #4c459f;
+        box-shadow: 0 12px 56px 0 rgba(0, 0, 0, 0.24),
+          0 17px 50px 0 rgba(0, 0, 0, 0.19);
+      }
+
+      #inputquery {
+        padding: 0.5rem 1rem;
+        border-radius: 0.2rem;
+        border: none;
+        outline: #484282;
+      }
     </style>
   </head>
   <body>
@@ -108,8 +140,9 @@
                   type="text"
                   name="query"
                   placeholder="Enter your filter query..."
+                  id="inputquery"
                 />
-                <button type="submit">Filter</button>
+                <button type="submit" class="filterbtn">Filter</button>
               </form>
             </div>
 
@@ -125,7 +158,9 @@
                 {% endfor %}
               </ul>
 
-              <a href="{{ url_for('view_borrowed_books_with_deadlines') }}"
+              <a
+                href="{{ url_for('view_borrowed_books_with_deadlines') }}"
+                class="btn btn-custom btn-sm"
                 >View Borrowed Books</a
               >
             </div>
