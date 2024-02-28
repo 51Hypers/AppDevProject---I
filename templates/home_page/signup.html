@@ -5,28 +5,50 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Signup</title>
+    <link rel="stylesheet" href="static/styles/login.css" />
+    <style>
+      .login-container {
+        height: auto;
+      }
+
+      #user,
+      #librarian {
+        width: fit-content;
+        display: inline;
+      }
+
+      #signupbtn {
+        width: 99%;
+        margin-top: 2rem;
+        font-weight: 700;
+      }
+    </style>
   </head>
   <body>
-    <h1>Signup</h1>
-    {% with messages = get_flashed_messages(with_categories=true) %} {% if
-    messages %} {% for category, message in messages %} {% if category ==
-    'error' %}
-    <script>
-      alert('{{ message }}');
-    </script>
-    {% endif %} {% endfor %} {% endif %} {% endwith %}
-    <form method="POST" action="/signup">
-      <label for="username">Username:</label><br />
-      <input type="text" id="username" name="username" required /><br />
-      <label for="email">Email:</label><br />
-      <input type="email" id="email" name="email" required /><br />
-      <label for="password">Password:</label><br />
-      <input type="password" id="password" name="password" required /><br />
-      <input type="radio" id="user" name="role" value="user" checked />
-      <label for="user">Signup as User</label><br />
-      <input type="radio" id="librarian" name="role" value="librarian" />
-      <label for="librarian">Signup as Librarian</label><br />
-      <input type="submit" value="Signup" />
-    </form>
+    <div class="login-container">
+      <h1>Signup</h1>
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %} {% for category, message in messages %} {% if category ==
+      'error' %}
+      <script>
+        alert("{{ message }}");
+      </script>
+      {% endif %} {% endfor %} {% endif %} {% endwith %}
+      <form method="POST" action="/signup">
+        <label for="username">Username:</label><br />
+        <input type="text" id="username" name="username" required /><br />
+        <label for="email">Email:</label><br />
+        <input type="email" id="email" name="email" required /><br />
+        <label for="password">Password:</label><br />
+        <input type="password" id="password" name="password" required /><br />
+        <div class="role">
+          <input type="radio" id="user" name="role" value="user" checked />
+          <label for="user">Signup as User</label><br />
+          <input type="radio" id="librarian" name="role" value="librarian" />
+          <label for="librarian">Signup as Librarian</label><br />
+        </div>
+        <button type="submit" value="Signup" id="signupbtn">Sign Up</button>
+      </form>
+    </div>
   </body>
 </html>
