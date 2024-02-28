@@ -3,15 +3,45 @@
   <head>
     <title>Admin Login</title>
   </head>
+  <style>
+    body {
+      /* background: linear-gradient(to right, #24243e, #302b63, #0f0c29); */
+      background-color: #343a40;
+    }
+    .container {
+      background-color: #580000;
+      justify-content: flex-start;
+      align-items: flex-start;
+      /* height: 400px; */
+      padding: 2rem;
+      width: 20%;
+      /* border: 1px solid red; */
+      border-radius: 10px;
+      color: white;
+      margin: 12rem auto;
+    }
+
+    input[type="submit"] {
+      padding: 0.5rem 1rem;
+      margin-top: 1rem;
+      width: 100%;
+    }
+
+    #password {
+      width: 98%;
+    }
+  </style>
   <body>
-    <h1>Admin Login</h1>
-    <form method="POST">
-      <label for="password">Password:</label><br />
-      <input type="password" id="password" name="password" required /><br />
-      <input type="submit" value="Login" />
-    </form>
-    {% if error %}
-    <p>{{ error }}</p>
-    {% endif %}
+    <div class="container">
+      <h1>Admin Login</h1>
+      <form method="POST">
+        <label for="password">Password:</label><br />
+        <input type="password" id="password" name="password" required /><br />
+        <input type="submit" value="Login" />
+      </form>
+      {% if error %}
+      <p>{{ error }}</p>
+      {% endif %}
+    </div>
   </body>
 </html>

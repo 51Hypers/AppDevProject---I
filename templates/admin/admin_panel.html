@@ -1,32 +1,61 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>Admin Panel</title>
-</head>
-<body>
-    <h1>Admin Panel</h1>
-    <table>
+    <style>
+      .container {
+        width: 50%;
+        padding: 1rem 8rem;
+        margin: 4rem auto;
+        background-color: #580000;
+        color: white;
+      }
+
+      table {
+        width: 100%;
+      }
+
+      h1 {
+        text-align: center;
+        margin: 2rem auto 5rem auto;
+      }
+
+      body {
+        /* background: linear-gradient(to right, #24243e, #302b63, #0f0c29); */
+        background-color: #343a40;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Admin Panel</h1>
+      <table>
         <tr>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Action</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Action</th>
         </tr>
         {% for request in librarian_requests %}
         <tr>
-            <td>{{ request.username }}</td>
-            <td>{{ request.email }}</td>
-            <td>
-                <form method="POST" action="/admin/action">
-                    <input type="hidden" name="librarian_request_id" value="{{ request.id }}">
-                    <select name="action">
-                        <option value="accept">Accept</option>
-                        <option value="reject">Reject</option>
-                    </select>
-                    <input type="submit" value="Submit">
-                </form>
-            </td>
+          <td>{{ request.username }}</td>
+          <td>{{ request.email }}</td>
+          <td>
+            <form method="POST" action="/admin/action">
+              <input
+                type="hidden"
+                name="librarian_request_id"
+                value="{{ request.id }}"
+              />
+              <select name="action">
+                <option value="accept">Accept</option>
+                <option value="reject">Reject</option>
+              </select>
+              <input type="submit" value="Submit" />
+            </form>
+          </td>
         </tr>
         {% endfor %}
-    </table>
-</body>
+      </table>
+    </div>
+  </body>
 </html>
