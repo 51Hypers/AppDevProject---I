@@ -1,172 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>User Details</title>
-  <style>
-    body {
-      color: #fff;
-      background-color: #343a40; /* Dark gray background */
-    }
-    .page-header {
-      background-color: #580000; /* Maroon background */
-      text-align: center;
-      border-radius: 5px;
-      margin-bottom: 20px;
-      padding: 10px 0;
-    }
-    .page-header h1 {
-      font-weight: 700; /* Make heading bolder */
-      text-shadow: 2px 2px 4px #000; /* Soft shadow for depth */
-      margin: 0;
-    }
-    .user-header {
-      background-color: #580000; /* Maroon background */
-      padding: 10px;
-      border-radius: 5px;
-      margin-bottom: 10px;
-    }
-    .user-header h2 {
-      font-weight: 700; /* Make username bolder */
-      text-shadow: 1px 1px 2px #000; /* Soft shadow for depth */
-      margin: 0;
-      cursor: pointer; /* Change cursor to indicate clickable */
-    }
-    .user-container {
-      background-color: #181b1d; /* Slightly darker gray for user container */
-      margin-bottom: 20px;
-      padding: 15px;
-      border-radius: 8px;
-    }
-    .stats-section {
-      background-color: rgb(93, 2, 2); /* Slightly lighter gray for sections */
-      margin: 10px 0;
-      padding: 10px;
-      border-radius: 5px;
-      transition: transform 0.2s; /* Animation effect */
-    }
-    .stats-section:hover {
-      transform: scale(1.02); /* Slight scale on hover */
-    }
-    .list-group-item {
-      background-color: #343a40; /* Matching the body background */
-      border: 1px solid #555; /* Adding a slight border for definition */
-      transition: background-color 0.2s ease; /* Smooth transition for hover effect */
-    }
-    .list-group-item:hover {
-      background-color: #40474e; /* Slightly lighter on hover */
-    }
-    .container {
-      max-width: 960px; /* Adjust container width for better alignment */
-      margin: 0 auto;
-      padding: 20px;
-    }
-    .btn-revoke {
-      background-color: #900;
-      color: #fff;
-      border: none;
-      transition: background-color 0.2s ease;
-    }
-    .btn-revoke:hover {
-      background-color: #a00;
-    }
-    .request-info {
-      background-color: #505960; /* Matching the user container for requests */
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 5px;
-    }
-    .registration-date {
-      color: #fff; /* White text for registration date */
-      font-style: italic;
-      margin-bottom: 15px;
-    }
-    .user-details {
-      display: none; /* Hide user details by default */
-      margin-top: 10px; /* Add some margin above the details for spacing */
-    }
-  </style>
-</head>
-<body>
-  {% include 'dashboards/navbar.html' %}
-  <div class="container">
-    <div class="page-header">
-      <h1>User Details</h1>
-    </div>
-    {% for user in users %}
-    <div class="user-container">
-      <div class="user-header" onclick="toggleDetails('details-{{ loop.index }}')">
-        <h2>{{ user.username }}</h2>
-      </div>
-      <div id="details-{{ loop.index }}" class="user-details">
-      <p>Email: {{ user.email}}</p>
-      <p>Registered on: {{ user.t_register.strftime('%Y-%m-%d %H:%M:%S') }}</p>
-
-      <div class="stats-section">
-        <h3>Unapproved Requests</h3>
-        {% for request in user.unapproved_requests %}
-        <div class="request-info">
-          <p>Book Title: {{ request.book.name }}, Book ID: {{ request.book_id }}, Requested On: {{ request.t_request }}</p>
-        </div>
-        {% else %}
-        <p class="no-data">No unapproved requests.</p>
-        {% endfor %}
-      </div>
-
-      <div class="stats-section">
-        <h3>Approved Requests</h3>
-        {% for request in user.approved_requests %}
-        <div class="request-info">
-          <p>Book Title: {{ request.book.name }}, Book ID: {{ request.book_id }}, Approved, Return by: {{ request.t_deadline }}</p>
-        </div>
-        {% else %}
-        <p class="no-data">No approved requests.</p>
-        {% endfor %}
-      </div>
-
-      <div class="stats-section">
-        <h3>Rejected Requests</h3>
-        {% for request in user.rejected_requests %}
-        <div class="request-info">
-          <p>Book Title: {{ request.book.name }}, Book ID: {{ request.book_id }}, Rejected</p>
-        </div>
-        {% else %}
-        <p class="no-data">No rejected requests.</p>
-        {% endfor %}
-      </div>
-
-      <div class="stats-section">
-        <h3>Returned Books</h3>
-        {% for request in user.returned_books %}
-        <div class="request-info">
-          <p>Book Title: {{ request.book.name }}, Book ID: {{ request.book_id }}, Returned On: {{ request.t_return }}</p>
-        </div>
-        {% else %}
-        <p class="no-data">No books returned yet.</p>
-        {% endfor %}
-      </div>
-
-      <div class="stats-section">
-        <h3>Unreturned Books</h3>
-        {% for request in user.unreturned_books %}
-        <div class="request-info">
-          <p>Book Title: {{ request.book.name }}, Book ID: {{ request.book_id }}, To be returned</p>
-        </div>
-        {% else %}
-        <p class="no-data">All books returned.</p>
-        {% endfor %}
-      </div>
-    </div>  
-    </div> <!-- Closing user-container -->
-    {% endfor %}
-  </div>
-  <script>
-    function toggleDetails(id) {
-      var element = document.getElementById(id);
-      if (element) {
-        element.style.display = element.style.display === 'block' ? 'none' : 'block';
+  <head>
+    <meta charset="UTF-8" />
+    <title>User Details</title>
+    <style>
+      body {
+        color: #fff;
+        background-color: #343a40; /* Dark gray background */
       }
-    }
-  </script>
-</body>
+      .page-header {
+        background-color: #580000; /* Maroon background */
+        text-align: center;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        padding: 10px 0;
+      }
+      .page-header h1 {
+        font-weight: 700; /* Make heading bolder */
+        text-shadow: 2px 2px 4px #000; /* Soft shadow for depth */
+        margin: 0;
+      }
+      .user-header {
+        background-color: #580000; /* Maroon background */
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+      }
+      .user-header h2 {
+        font-weight: 700; /* Make username bolder */
+        text-shadow: 1px 1px 2px #000; /* Soft shadow for depth */
+        margin: 0;
+        cursor: pointer; /* Change cursor to indicate clickable */
+      }
+      .user-container {
+        background-color: #181b1d; /* Slightly darker gray for user container */
+        margin-bottom: 20px;
+        padding: 15px;
+        border-radius: 8px;
+      }
+      .stats-section {
+        background-color: rgb(
+          93,
+          2,
+          2
+        ); /* Slightly lighter gray for sections */
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 5px;
+        transition: transform 0.2s; /* Animation effect */
+      }
+      .stats-section:hover {
+        transform: scale(1.02); /* Slight scale on hover */
+      }
+      .list-group-item {
+        background-color: #343a40; /* Matching the body background */
+        border: 1px solid #555; /* Adding a slight border for definition */
+        transition: background-color 0.2s ease; /* Smooth transition for hover effect */
+      }
+      .list-group-item:hover {
+        background-color: #40474e; /* Slightly lighter on hover */
+      }
+      .container {
+        max-width: 960px; /* Adjust container width for better alignment */
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .btn-revoke {
+        background-color: #900;
+        color: #fff;
+        border: none;
+        transition: background-color 0.2s ease;
+      }
+      .btn-revoke:hover {
+        background-color: #a00;
+      }
+      .request-info {
+        background-color: #505960; /* Matching the user container for requests */
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+      }
+      .registration-date {
+        color: #fff; /* White text for registration date */
+        font-style: italic;
+        margin-bottom: 15px;
+      }
+      .user-details {
+        display: none; /* Hide user details by default */
+        margin-top: 10px; /* Add some margin above the details for spacing */
+      }
+    </style>
+  </head>
+  <body>
+    {% include 'dashboards/navbar.html' %}
+    <div class="container">
+      <div class="page-header">
+        <h1>User Details</h1>
+      </div>
+      {% for user in users %}
+      <div class="user-container">
+        <div
+          class="user-header"
+          onclick="toggleDetails('details-{{ loop.index }}')"
+        >
+          <h2 style="display: inline">{{ user.username }}</h2>
+          <span style="display: inline;">&#9660;</span>
+        </div>
+        <div id="details-{{ loop.index }}" class="user-details">
+          <p>Email: {{ user.email}}</p>
+          <p>
+            Registered on: {{ user.t_register.strftime('%Y-%m-%d %H:%M:%S') }}
+          </p>
+
+          <div class="stats-section">
+            <h3>Unapproved Requests</h3>
+            {% for request in user.unapproved_requests %}
+            <div class="request-info">
+              <p>
+                Book Title: {{ request.book.name }}, Book ID: {{ request.book_id
+                }}, Requested On: {{ request.t_request }}
+              </p>
+            </div>
+            {% else %}
+            <p class="no-data">No unapproved requests.</p>
+            {% endfor %}
+          </div>
+
+          <div class="stats-section">
+            <h3>Approved Requests</h3>
+            {% for request in user.approved_requests %}
+            <div class="request-info">
+              <p>
+                Book Title: {{ request.book.name }}, Book ID: {{ request.book_id
+                }}, Approved, Return by: {{ request.t_deadline }}
+              </p>
+            </div>
+            {% else %}
+            <p class="no-data">No approved requests.</p>
+            {% endfor %}
+          </div>
+
+          <div class="stats-section">
+            <h3>Rejected Requests</h3>
+            {% for request in user.rejected_requests %}
+            <div class="request-info">
+              <p>
+                Book Title: {{ request.book.name }}, Book ID: {{ request.book_id
+                }}, Rejected
+              </p>
+            </div>
+            {% else %}
+            <p class="no-data">No rejected requests.</p>
+            {% endfor %}
+          </div>
+
+          <div class="stats-section">
+            <h3>Returned Books</h3>
+            {% for request in user.returned_books %}
+            <div class="request-info">
+              <p>
+                Book Title: {{ request.book.name }}, Book ID: {{ request.book_id
+                }}, Returned On: {{ request.t_return }}
+              </p>
+            </div>
+            {% else %}
+            <p class="no-data">No books returned yet.</p>
+            {% endfor %}
+          </div>
+
+          <div class="stats-section">
+            <h3>Unreturned Books</h3>
+            {% for request in user.unreturned_books %}
+            <div class="request-info">
+              <p>
+                Book Title: {{ request.book.name }}, Book ID: {{ request.book_id
+                }}, To be returned
+              </p>
+            </div>
+            {% else %}
+            <p class="no-data">All books returned.</p>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <!-- Closing user-container -->
+      {% endfor %}
+    </div>
+    <script>
+      function toggleDetails(id) {
+        var element = document.getElementById(id);
+        if (element) {
+          element.style.display =
+            element.style.display === "block" ? "none" : "block";
+        }
+      }
+    </script>
+  </body>
 </html>

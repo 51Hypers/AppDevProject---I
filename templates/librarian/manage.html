@@ -28,13 +28,13 @@ h1 {
 
 label {
   display: block; /* Labels are block level for better structure */
-  margin-top: 10px; /* Margin on top for spacing */
+  margin-top: 20px; /* Margin on top for spacing */
 }
 
 input[type="text"],
 textarea,
 select {
-  width: 100%;
+  width: 98%;
   padding: 8px;
   margin-top: 5px;
   border: none;
@@ -44,21 +44,24 @@ select {
 }
 
 input[type="submit"] {
-  background-color: #900;
-  color: #fff;
   border: none;
-  transition: background-color 0.2s ease, transform 0.2s ease; /* Added transform to transition */
   padding: 10px 20px;
   border-radius: 4px;
   cursor: pointer;
   display: block;
   margin: 20px auto;
   text-transform: uppercase;
+  font-weight: 700;
+  background-color: #900;
+  color: #fff;
+  transition: background-color 0.2s ease;
+  width: 20rem;
+  margin: 1rem auto;
 }
 
 input[type="submit"]:hover {
-  background-color: #444;
-  transform: scale(1.05); /* Scale effect on hover */
+  background-color: #a00;
+  color: white; /* Scale effect on hover */
 }
 
 ul {
@@ -77,6 +80,10 @@ li {
 
 li:hover {
   transform: scale(1.05); /* Scale effect on hover */
+}
+
+#section_id {
+  width: 100%;
 }
 
 body {

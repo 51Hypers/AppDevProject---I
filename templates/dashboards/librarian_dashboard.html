@@ -13,6 +13,14 @@
         margin: 0;
         padding: 0;
       }
+
+      .chart-container {
+        margin-top: 5rem;
+        justify-content: space-evenly !important;
+        align-items: center !important;
+        /* display: flex; */
+      }
+
       canvas {
         top: 150px;
         left: 50%;
@@ -44,11 +52,19 @@
         display: flex;
         justify-content: space-between;
       }
+
+      h2 {
+        margin-top: 4rem;
+      }
+
+      h2,
+      p {
+        text-align: center;
+      }
     </style>
   </head>
   <body>
     {% include 'dashboards/navbar.html' %}
-
     <h2>Welcome to the Librarian Dashboard</h2>
     <p>
       Use the navigation bar to manage users, view book requests, and access
@@ -61,28 +77,28 @@
 
     <!-- Script for fetching and displaying section distribution -->
     <script>
-      fetch('/api/section_distribution')
+      fetch("/api/section_distribution")
         .then((response) => response.json())
         .then((data) => {
           var sectionDistributionData = {
             labels: Object.keys(data),
             datasets: [
               {
-                label: 'Section Distribution',
+                label: "Section Distribution",
                 data: Object.values(data),
                 backgroundColor: [
-                  'rgba(255, 99, 132, 0.7)',
-                  'rgba(54, 162, 235, 0.7)',
-                  'rgba(255, 206, 86, 0.7)',
-                  'rgba(75, 192, 192, 0.7)',
-                  'rgba(153, 102, 255, 0.7)',
+                  "rgba(255, 99, 132, 0.7)",
+                  "rgba(54, 162, 235, 0.7)",
+                  "rgba(255, 206, 86, 0.7)",
+                  "rgba(75, 192, 192, 0.7)",
+                  "rgba(153, 102, 255, 0.7)",
                 ],
                 borderColor: [
-                  'rgba(255, 99, 132, 1)',
-                  'rgba(54, 162, 235, 1)',
-                  'rgba(255, 206, 86, 1)',
-                  'rgba(75, 192, 192, 1)',
-                  'rgba(153, 102, 255, 1)',
+                  "rgba(255, 99, 132, 1)",
+                  "rgba(54, 162, 235, 1)",
+                  "rgba(255, 206, 86, 1)",
+                  "rgba(75, 192, 192, 1)",
+                  "rgba(153, 102, 255, 1)",
                 ],
                 borderWidth: 1,
               },
@@ -90,16 +106,16 @@
           };
 
           var sectionDistributionChart = new Chart(
-            document.getElementById('sectionDistributionChart'),
+            document.getElementById("sectionDistributionChart"),
             {
-              type: 'pie',
+              type: "pie",
               data: sectionDistributionData,
               options: {
                 responsive: false,
                 maintainAspectRatio: false,
                 title: {
                   display: true,
-                  text: 'Section Distribution',
+                  text: "Section Distribution",
                 },
               },
             }
@@ -107,47 +123,47 @@
         });
     </script>
     <script>
-      fetch('/api/books_borrowed_over_time')
+      fetch("/api/books_borrowed_over_time")
         .then((response) => response.json())
         .then((data) => {
           var booksBorrowedOverTimeData = {
             labels: Object.keys(data).map((month) =>
-              new Date(month + ' 00:00:00').toLocaleDateString('en-US', {
-                month: 'short',
-                year: 'numeric',
+              new Date(month + " 00:00:00").toLocaleDateString("en-US", {
+                month: "short",
+                year: "numeric",
               })
             ),
             datasets: [
               {
-                label: 'Number of Books Borrowed Over Time',
+                label: "Number of Books Borrowed Over Time",
                 data: Object.values(data),
                 fill: false,
-                borderColor: 'rgba(75, 192, 192, 1)',
+                borderColor: "rgba(75, 192, 192, 1)",
                 lineTension: 0.1,
               },
             ],
           };
 
           var booksBorrowedOverTimeChart = new Chart(
-            document.getElementById('booksBorrowedOverTimeChart'),
+            document.getElementById("booksBorrowedOverTimeChart"),
             {
-              type: 'line',
+              type: "line",
               data: booksBorrowedOverTimeData,
               options: {
                 responsive: false,
                 maintainAspectRatio: false,
                 title: {
                   display: true,
-                  text: 'Number of Books Borrowed Over Time',
+                  text: "Number of Books Borrowed Over Time",
                 },
                 scales: {
                   xAxes: [
                     {
-                      type: 'time',
+                      type: "time",
                       time: {
-                        unit: 'month',
+                        unit: "month",
                         displayFormats: {
-                          month: 'MMM YYYY',
+                          month: "MMM YYYY",
                         },
                       },
                       ticks: {
