@@ -8,14 +8,20 @@
     <link rel="stylesheet" href="static/styles/home_styles.css" />
   </head>
   <body>
-    <h1>Welcome to the Library System</h1>
-    <p>
-      Welcome to the Library Management System. Log in to access your account, manage loans, and explore our collection.
-    </p>
+    <div class="left">
+      <h1>Welcome to the Library System</h1>
+      <p>
+        Welcome to the Library Management System. Log in to access your account, manage loans, and explore our collection.
+      </p>
 
-    <ul>
-      <li><a href="{{ url_for('login') }}">Login</a></li>
-      <li><a href="{{ url_for('signup') }}">Signup</a></li>
-    </ul>
+    </div>
+    <div class="right">
+      <div class="bookmark"></div>
+      <ul>
+        <li><a href="{{ url_for('login') }}">Login</a></li>
+        <li><a href="{{ url_for('signup') }}">Signup</a></li>
+      </ul>
+
+    </div>
   </body>
 </html>

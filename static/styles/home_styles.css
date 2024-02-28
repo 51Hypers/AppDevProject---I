@@ -1,9 +1,9 @@
 body {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex-direction: row;
+  justify-content: space-around;
   align-items: center;
-  background: linear-gradient( to right, #24243e, #302b63, #0f0c29 );
+  background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
   margin-top: 15rem;
   color: white;
   text-align: center;
@@ -15,11 +15,12 @@ ul {
   list-style: none;
   padding: 0;
   padding: 3rem 0;
-  gap: 4rem;
+  gap: 6rem;
   width: 100%;
   justify-content: center;
   align-items: center;
   height: 10rem;
+  padding-top: 10rem;
 }
 
 a {
@@ -32,14 +33,40 @@ a {
   transition: 0.3s ease all;
 }
 
-p{
+p {
   font-size: 90%;
-  width: 33%;
+  width: 85%;
   opacity: 50%;
+  margin: 0 auto;
 }
 
 a:hover {
   background-color: #4c459f;
   /* padding: 1.2rem 1.7rem; */
-  box-shadow: 0 3px 3px 0 rgba(0,0,0,0.14),0 1px 7px 0 rgba(0,0,0,0.12),0 3px 1px -1px rgba(0,0,0,0.2);
+  box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.14), 0 1px 7px 0 rgba(0, 0, 0, 0.12),
+    0 3px 1px -1px rgba(0, 0, 0, 0.2);
+}
+
+.bookmark {
+  clip-path: polygon(
+    100% 0px,
+    100% 100%,
+    49.25% 77.65%,
+    0% 100%,
+    0px 49%,
+    0% 0%
+  );
+  background-color: #262543;
+  position: absolute;
+  width: 20rem;
+  height: 53rem;
+  top: 0;
+  z-index: -10;
+  right: 11rem;
+  filter: drop-shadow(0.35rem 0.35rem 0.4rem rgba(255, 0, 0, 1));
+}
+
+.left {
+  display: flex;
+  flex-direction: column;
 }
