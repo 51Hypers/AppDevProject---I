@@ -8,7 +8,7 @@ from nit import app, db
 from flask import abort, render_template, render_template_string, request, redirect, send_file, url_for, session, flash
 from models import User, Section, Book, UserBook, Feedback
 from sqlalchemy.orm.exc import NoResultFound
-from models import LibrarianRequest
+from models import LibrarianRequest,PayInfo
 from datetime import datetime, timedelta
 from sqlalchemy.exc import IntegrityError
 from flask import Flask, jsonify
@@ -109,11 +109,11 @@ def user_dashboard():
     if not user_id:
         flash('Please login to view your dashboard.', 'error')
         return redirect(url_for('login'))
-
     borrowed_books = db.session.query(UserBook, Book).join(Book, UserBook.book_id == Book.id).filter(UserBook.user_id == user_id, UserBook.t_return == None,(UserBook.is_revoked == False) | (UserBook.is_revoked == None), UserBook.is_approved == True).all()
     now = datetime.utcnow()
     books_revoked = False
     deadline_warning_issued = False
+    revbook = db.session.query(UserBook, Book).join(Book, UserBook.book_id == Book.id).filter(UserBook.user_id == user_id, UserBook.is_revoked == True).all()
 
     for user_book, book in borrowed_books:
         if user_book.t_deadline and now > user_book.t_deadline:
@@ -132,7 +132,7 @@ def user_dashboard():
     upcoming_deadlines = [(user_book, book) for user_book, book in borrowed_books if user_book.t_deadline and user_book.t_deadline > now]
     upcoming_deadlines.sort(key=lambda x: x[0].t_deadline)  # Sort by deadline
     upcoming_deadlines = upcoming_deadlines[:3]
-    return render_template('dashboards/user_dashboard.html', borrowed_books=borrowed_books,upcoming_deadlines=upcoming_deadlines)
+    return render_template('dashboards/user_dashboard.html', borrowed_books=borrowed_books,upcoming_deadlines=upcoming_deadlines,revbook=revbook)
 
 
 @app.route('/books', methods=['GET'])
@@ -762,6 +762,81 @@ def submit_feedback():
     return 'Feedback submitted successfully'
 
 
+#payment
+import stripe
+
+app.config['STRIPE_PUBLIC_KEY'] = 'pk_test_51Oot5iSJwEJZXRKmTNtNCrJAdkp6DWPndeYsMwC8W963TVsKqGWNMhh26BBE1WWXGtVtfw3iy9QK3OEgfjtkJoGS00e5f0Jb2M'
+app.config['STRIPE_SECRET_KEY'] = 'sk_test_51Oot5iSJwEJZXRKmlcmfonrTALj0QQjlzWSifWhW3MFxmbfXnF1q4wgCavof1RZOcCsFebUNDhri22dxZFTCn5Sq00DGYtIGST'
+
+stripe.api_key = app.config['STRIPE_SECRET_KEY']
+@app.route('/buy_book/<int:book_id>', methods=['GET', 'POST'])
+def buy_book(book_id):
+    # Retrieve the book from the database
+    user_id = session.get('user_id')
+    book = Book.query.get(book_id)
+    user = User.query.get(user_id)
+    if not book:
+        return 'Book not found', 404
+
+    # Constant price for the book
+    book_price = 10  # Example price, replace with actual constant price
+
+    if request.method == 'POST':
+        try:
+            # Create a PaymentIntent
+            intent = stripe.PaymentIntent.create(
+                amount=int(book_price * 100),  # Amount in cents
+                currency='usd',
+                description='Book purchase',
+                metadata={
+                    'user_id': user_id,
+                    'book_name': book.name
+                }
+            )
+            customer = stripe.Customer.create(
+                email=user.email,
+                name=user.username,
+                metadata={
+                    'userid': user_id,
+                    'product': book.name
+                }
+            )
+            pay_info = PayInfo(
+                username=user.username,
+                book_id=book.id,
+                transaction_id=intent.id
+            )
+            db.session.add(pay_info)
+            db.session.commit()
+
+            return jsonify({'success': True})
+        except stripe.error.CardError as e:
+            # Payment failed, handle the error
+            return render_template('payment_failed.html', error=e)
+
+    # Render the payment page with the book details
+    return render_template('payment/payment.html', book=book, price=book_price)
+
+@app.route('/payment_success')
+def payment_success():
+    return render_template('payment/succ.html')
+
+@app.route('/payment_failed')
+def payment_failed():
+    return render_template('payment/fail.html')
+
+
+@app.route('/bought')
+def bought():
+    user_id = session.get('user_id')
+    if not user_id:
+        flash('Please login to view your books.', 'error')
+        return redirect(url_for('login'))
+    user = User.query.get(user_id)
+    bought_books = PayInfo.query.filter_by(username=user.username).all()
+    return render_template('books/bought.html', bought_books=bought_books)
+
+
 # <-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------> #
 #PDF Handling
 def allowed_file(filename):
@@ -838,6 +913,11 @@ def print_pdf(filename):
     except FileNotFoundError:
         abort(404)
 
+
+
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)
 
@@ -851,5 +931,3 @@ if __name__ == '__main__':
 
 
 
-if __name__ == "__main__":
-    app.run(debug=True, port=8080)

@@ -131,6 +131,13 @@
                   >View Feedback</a
                 >
               </td>
+              <td>
+                <a
+                  href="{{ url_for('buy_book', book_id=book.id) }}"
+                  class="btn-a btn-buy"
+                  >Buy Book</a
+                >
+              </td>
             </tr>
             {% endfor %}
           </tbody>
@@ -141,9 +148,9 @@
     <script>
       function setSortBy() {
         const urlParams = new URLSearchParams(window.location.search);
-        const sortBy = urlParams.get("sort_by");
+        const sortBy = urlParams.get('sort_by');
         if (sortBy) {
-          document.getElementById("sort_by").value = sortBy;
+          document.getElementById('sort_by').value = sortBy;
         }
       }
     </script>

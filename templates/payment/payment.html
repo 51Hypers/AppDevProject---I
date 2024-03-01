@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Buy Book</title>
+    <script src="https://js.stripe.com/v3/"></script>
+  </head>
+  <body>
+    <h1>Buy Book</h1>
+    <h2>{{ book.name }}</h2>
+    <p>Author: {{ book.author }}</p>
+    <p>Price: ${{ price }}</p>
+
+    <form id="payment-form">
+      <div id="card-element">
+        <!-- A Stripe Element will be inserted here. -->
+      </div>
+
+      <!-- Used to display form errors. -->
+      <div id="card-errors" role="alert"></div>
+
+      <button id="submit">Submit Payment</button>
+    </form>
+
+    <script>
+      var stripe = Stripe(
+        'pk_test_51Oot5iSJwEJZXRKmTNtNCrJAdkp6DWPndeYsMwC8W963TVsKqGWNMhh26BBE1WWXGtVtfw3iy9QK3OEgfjtkJoGS00e5f0Jb2M'
+      );
+      var elements = stripe.elements();
+
+      var style = {
+        base: {
+          fontSize: '16px',
+          color: '#32325d',
+        },
+      };
+
+      var card = elements.create('card', { style: style });
+      card.mount('#card-element');
+
+      card.on('change', function (event) {
+        var displayError = document.getElementById('card-errors');
+        if (event.error) {
+          displayError.textContent = event.error.message;
+        } else {
+          displayError.textContent = '';
+        }
+      });
+
+      var form = document.getElementById('payment-form');
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        stripe
+          .createPaymentMethod({
+            type: 'card',
+            card: card,
+          })
+          .then(function (result) {
+            if (result.error) {
+              var errorElement = document.getElementById('card-errors');
+              errorElement.textContent = result.error.message;
+            } else {
+              stripeConfirmPayment(result.paymentMethod.id);
+            }
+          });
+      });
+
+      function stripeConfirmPayment(paymentMethodId) {
+        fetch('/buy_book/{{ book.id }}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ payment_method_id: paymentMethodId }),
+        })
+          .then(function (result) {
+            return result.json();
+          })
+          .then(function (data) {
+            handleServerResponse(data);
+          });
+      }
+
+      function handleServerResponse(response) {
+        if (response.error) {
+          var errorElement = document.getElementById('card-errors');
+          errorElement.textContent = response.error;
+        } else {
+          window.location.href = '/payment_success';
+        }
+      }
+    </script>
+  </body>
+</html>

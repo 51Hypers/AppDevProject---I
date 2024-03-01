@@ -9,9 +9,9 @@
       rel="stylesheet"
     />
     <style>
-      @import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
+      @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
       body {
-        font-family: "Roboto", sans-serif;
+        font-family: 'Roboto', sans-serif;
         color: #fff;
         background: linear-gradient(
           to right,
@@ -63,7 +63,7 @@
       .form-custom {
         margin-top: 20px;
       }
-      input[type="text"] {
+      input[type='text'] {
         margin-bottom: 10px;
       }
 
@@ -145,6 +145,18 @@
                 <button type="submit" class="filterbtn">Filter</button>
               </form>
             </div>
+            <a
+              href="{{ url_for('bought') }}"
+              class="btn btn-custom btn-sm"
+              >Bought Books</a
+            >
+
+            <h2>Revoked Books</h2>
+            <ul>
+              {% for user_book, book in revbook %}
+              <li>{{ book.name }} by {{ book.author }}</li>
+              {% endfor %}
+            </ul>
 
             <!-- Deadlines -->
             <div class="deadlines">
@@ -203,35 +215,35 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-      fetch("/api/sections_of_interest_chart")
+      fetch('/api/sections_of_interest_chart')
         .then((response) => response.json())
         .then((data) => {
-          const canvas = document.getElementById("sectionPieChart");
-          const ctx = canvas.getContext("2d");
+          const canvas = document.getElementById('sectionPieChart');
+          const ctx = canvas.getContext('2d');
 
           const labels = Object.keys(data);
           const values = Object.values(data);
 
           const backgroundColors = [
-            "rgba(255, 99, 132, 0.7)",
-            "rgba(54, 162, 235, 0.7)",
-            "rgba(255, 206, 86, 0.7)",
-            "rgba(75, 192, 192, 0.7)",
-            "rgba(153, 102, 255, 0.7)",
-            "rgba(255, 159, 64, 0.7)",
+            'rgba(255, 99, 132, 0.7)',
+            'rgba(54, 162, 235, 0.7)',
+            'rgba(255, 206, 86, 0.7)',
+            'rgba(75, 192, 192, 0.7)',
+            'rgba(153, 102, 255, 0.7)',
+            'rgba(255, 159, 64, 0.7)',
           ];
 
           const hoverBackgroundColors = [
-            "rgba(255, 99, 132, 1)",
-            "rgba(54, 162, 235, 1)",
-            "rgba(255, 206, 86, 1)",
-            "rgba(75, 192, 192, 1)",
-            "rgba(153, 102, 255, 1)",
-            "rgba(255, 159, 64, 1)",
+            'rgba(255, 99, 132, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(255, 159, 64, 1)',
           ];
 
           new Chart(ctx, {
-            type: "pie",
+            type: 'pie',
             data: {
               labels: labels,
               datasets: [
@@ -247,7 +259,7 @@
               maintainAspectRatio: false,
               title: {
                 display: true,
-                text: "Books Read from Each Section",
+                text: 'Books Read from Each Section',
               },
             },
           });

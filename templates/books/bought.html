@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Purchased Books</title>
+  </head>
+  <body>
+    <h1>My Bought Books</h1>
+    <ul>
+      {% for payinfo in bought_books %}
+      <li>
+        {{ payinfo.book.name }}
+        <a href="" target="_blank">View</a>
+        <a href="">Download</a>
+      </li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>

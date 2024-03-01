@@ -152,3 +152,20 @@ class Feedback(db.Model):
     book = db.relationship('Book')
 
 
+class PayInfo(db.Model):
+    __tablename__ = "payinfo"
+    id = Column(Integer, primary_key=True)
+    username = Column(String(50), ForeignKey('user.username'), nullable=False)
+    book_id = Column(Integer, ForeignKey('book.id'), nullable=False)
+    transaction_id = Column(String(100), nullable=False)
+
+    def __init__(
+            self, id: int = None, username: str = None, book_id: int = None, transaction_id: str = None
+    ) -> None:
+        self.id = id
+        self.username = username
+        self.book_id = book_id
+        self.transaction_id = transaction_id
+
+    user = db.relationship('User', backref='payinfos')
+    book = db.relationship('Book', backref='payinfos')
