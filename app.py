@@ -56,6 +56,8 @@ def login():
                 return redirect(url_for('admin_dashboard'))  # Ensure the URL is correct
             elif user.is_librarian:
                 return redirect(url_for('librarian_dashboard'))  # Ensure the URL is correct
+            elif user.is_author:
+                return redirect(url_for('author_page', author_name=username))  # Redirect to author page with author's username
             else:
                 return redirect(url_for('user_dashboard'))  # Ensure the URL is correct
         else:
@@ -86,7 +88,9 @@ def signup():
         elif role == 'librarian':
             new_librarian_request = LibrarianRequest(username=username, email=email, password=password)
             db.session.add(new_librarian_request)
-
+        elif role == 'author':
+            new_user = User(username=username, email=email, password=password, is_librarian=False, is_author=True)
+            db.session.add(new_user)
         db.session.commit()
         flash('Account created successfully', 'success')
         return redirect(url_for('login'))
@@ -779,18 +783,19 @@ def buy_book(book_id):
         return 'Book not found', 404
 
     # Constant price for the book
-    book_price = 10  # Example price, replace with actual constant price
+    book_price = book.price  # Example price, replace with actual constant price
 
     if request.method == 'POST':
         try:
             # Create a PaymentIntent
             intent = stripe.PaymentIntent.create(
-                amount=int(book_price * 100),  # Amount in cents
+                amount=int(book_price),  # Amount in cents
                 currency='usd',
                 description='Book purchase',
                 metadata={
                     'user_id': user_id,
-                    'book_name': book.name
+                    'book_name': book.name,
+                    'price':book_price
                 }
             )
             customer = stripe.Customer.create(
@@ -798,7 +803,8 @@ def buy_book(book_id):
                 name=user.username,
                 metadata={
                     'userid': user_id,
-                    'product': book.name
+                    'product': book.name,
+                    'price':book_price
                 }
             )
             pay_info = PayInfo(
@@ -914,6 +920,100 @@ def print_pdf(filename):
         abort(404)
 
 
+#author
+@app.route('/author/<author_name>')
+def author_page(author_name):
+    # Query the books database to get books uploaded by the author
+    author_books = Book.query.filter_by(author=author_name).all()
+    author = User.query.filter_by(username=author_name).first()
+
+    if author is None:
+        return "Author not found", 404
+
+    return render_template('author/author.html', author=author, books=author_books)
+
+@app.route('/manage_books/<author_name>', methods=['GET', 'POST'])
+def manage_books(author_name):
+    # Ensure the current user is the author of the book
+    author_books = Book.query.filter_by(author=author_name).all()
+    sections = Section.query.all()
+
+    if request.method == 'POST':
+        if 'action' in request.form:
+            action = request.form.get('action')
+
+            if action == 'edit_book':
+                book_id = request.form.get('book_id')
+                book = Book.query.get(book_id)
+
+                if not book:
+                    flash('Book not found', 'error')
+                    return redirect(url_for('manage_books', author_name=author_name))
+
+                new_name = request.form.get('name')
+                new_section_id = request.form.get('section_id')
+                new_content = request.files.get('content')
+
+                if new_name:
+                    book.name = new_name
+                if new_section_id:
+                    book.section_id = new_section_id
+                if new_content:
+                    filename = secure_filename(new_content.filename)
+                    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                    new_content.save(filepath)
+                    book.content = filepath
+
+                try:
+                    db.session.commit()
+                    flash('Book updated successfully', 'success')
+                except Exception as e:
+                    db.session.rollback()
+                    flash('Error updating book: ' + str(e), 'error')
+
+                return redirect(url_for('manage_books', author_name=author_name))
+            elif action == 'delete_book':
+                book_id = request.form.get('book_id')
+                book = Book.query.get(book_id)
+
+                if not book:
+                    flash('Book not found', 'error')
+                    return redirect(url_for('manage_books', author_name=author_name))
+
+                try:
+                    db.session.delete(book)
+                    db.session.commit()
+                    flash('Book deleted successfully', 'success')
+                except Exception as e:
+                    db.session.rollback()
+                    flash('Error deleting book: ' + str(e), 'error')
+
+                return redirect(url_for('manage_books', author_name=author_name))
+        else:
+            new_book_name = request.form.get('newBookName')
+            new_book_section_id = request.form.get('newBookSection')
+            new_book_content = request.files.get('newBookContent')
+
+            if not all([new_book_name, new_book_section_id, new_book_content]):
+                flash('Missing data for adding book', 'error')
+                return redirect(url_for('manage_books', author_name=author_name))
+
+            try:
+                filename = secure_filename(new_book_content.filename)
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                new_book_content.save(filepath)
+
+                new_book = Book(name=new_book_name, author=author_name, section_id=new_book_section_id, content=filepath)
+                db.session.add(new_book)
+                db.session.commit()
+                flash('Book added successfully', 'success')
+            except Exception as e:
+                db.session.rollback()
+                flash('Error adding book: ' + str(e), 'error')
+
+            return redirect(url_for('manage_books', author_name=author_name))
+
+    return render_template('author/manage_books.html', author_name=author_name, author_books=author_books, sections=sections)
 
 
 

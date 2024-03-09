@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ author.username }}'s Books</title>
+  </head>
+  <body>
+    <h1>{{ author.username }}'s Books</h1>
+    <ul>
+      {% for book in books %}
+      <li>{{ book.name }} by {{ book.author }}</li>
+      {% endfor %}
+    </ul>
+    <a href="{{ url_for('manage_books', author_name=author.username) }}">Manage Book</a>
+
+  </body>
+</html>

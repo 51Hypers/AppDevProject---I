@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from faker import Faker
+import random
 
 app = Flask(__name__)
 UPLOAD_FOLDER = 'static\pdfs'
@@ -32,8 +33,9 @@ def populate():
                 name=fk.company(),
                 content=fk.text(),
                 author=fk.name(),
-                section_id=section.id
+                section_id=section.id,
+                price=random.randint(100, 500)
             )
             db.session.add(book)
             db.session.commit()
-            print(f"added book with {book.name}, {book.content[1]}, {book.author}")
+            print(f"added book with {book.name}, {book.content[1]}, {book.author}, {book.price}")

@@ -15,11 +15,12 @@ class User(db.Model):
     t_register = Column(DateTime, default=datetime.utcnow)
     is_librarian = Column(Boolean, default=False)
     is_admin = Column(Boolean, default=False)
+    is_author = Column(Boolean, default=False)  # New column for indicating if user is an author
 
     user_books = db.relationship('UserBook', back_populates='user', lazy=True)
 
     def __init__(
-            self, id: str = None, username: str = None, password: str = None, email: str = None, t_register: datetime = None, is_librarian: bool = None, is_admin: bool = None
+            self, id: str = None, username: str = None, password: str = None, email: str = None, t_register: datetime = None, is_librarian: bool = None, is_admin: bool = None, is_author: bool = None
     ) -> None:
         self.id = id
         self.username = username
@@ -28,7 +29,7 @@ class User(db.Model):
         self.t_register = t_register
         self.is_librarian = is_librarian
         self.is_admin = is_admin
-    
+        self.is_author = is_author
     def grant_librarian_access(self):
         self.is_librarian = True
         db.session.commit()
@@ -55,18 +56,21 @@ class Book(db.Model):
     name = Column(String(100), nullable=False)
     content = Column(Text, nullable=False)
     author = Column(String(100), nullable=False)
-    section_id = Column(Integer, ForeignKey('section.id'), nullable=False)   
+    section_id = Column(Integer, ForeignKey('section.id'), nullable=False)
+    price = Column(Integer)  # Assuming price is an integer
 
     def __init__(
-            self, id: int = None, name: str = None, content: str = None, author: str = None, section_id: int = None
+            self, id: int = None, name: str = None, content: str = None, author: str = None, section_id: int = None, price: int = None
     ) -> None:
         self.id = id
         self.name = name
         self.content = content
         self.author = author
         self.section_id = section_id
+        self.price = price
 
     user_books = db.relationship('UserBook', back_populates='book', lazy=True)
+
 
 
 class Section(db.Model):

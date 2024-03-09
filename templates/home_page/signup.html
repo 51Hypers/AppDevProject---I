@@ -12,7 +12,8 @@
       }
 
       #user,
-      #librarian {
+      #librarian,
+      #author {
         width: fit-content;
         display: inline;
       }
@@ -31,7 +32,7 @@
       messages %} {% for category, message in messages %} {% if category ==
       'error' %}
       <script>
-        alert("{{ message }}");
+        alert('{{ message }}');
       </script>
       {% endif %} {% endfor %} {% endif %} {% endwith %}
       <form method="POST" action="/signup">
@@ -46,6 +47,8 @@
           <label for="user">Signup as User</label><br />
           <input type="radio" id="librarian" name="role" value="librarian" />
           <label for="librarian">Signup as Librarian</label><br />
+          <input type="radio" id="author" name="role" value="author" />
+          <label for="author">Become an Author</label><br />
         </div>
         <button type="submit" value="Signup" id="signupbtn">Sign Up</button>
       </form>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Manage Books</title>
+    <script>
+      function toggleEditFields() {
+        var actionSelect = document.getElementById('action');
+        var editFields = document.getElementById('editFields');
+        var deleteField = document.getElementById('deleteField');
+
+        if (actionSelect.value === 'edit_book') {
+          editFields.style.display = 'block';
+          deleteField.style.display = 'none';
+        } else if (actionSelect.value === 'delete_book') {
+          editFields.style.display = 'none';
+          deleteField.style.display = 'block';
+        }
+      }
+
+      // Ensure the edit fields are hidden initially
+      window.onload = function () {
+        var editFields = document.getElementById('editFields');
+        var deleteField = document.getElementById('deleteField');
+        editFields.style.display = 'block'; // Show edit fields by default
+        deleteField.style.display = 'none'; // Hide delete field by default
+      };
+    </script>
+  </head>
+  <body>
+    <h1>Manage Books for {{ author_name }}</h1>
+    <form method="POST">
+      <input type="hidden" name="author_name" value="{{ author_name }}" />
+      <label for="book">Choose a book:</label>
+      <select id="book" name="book_id">
+        {% for book in author_books %}
+        <option value="{{ book.id }}">{{ book.name }}</option>
+        {% endfor %}
+      </select>
+      <label for="action">Select action:</label>
+      <select id="action" name="action" onchange="toggleEditFields()">
+        <option value="edit_book" selected>Edit Book</option>
+        <option value="delete_book">Delete Book</option>
+      </select>
+      <div id="editFields">
+        <label for="name">New Book Name:</label>
+        <input type="text" id="name" name="name" />
+        <label for="section_id">Select New Section:</label>
+        <select id="section_id" name="section_id">
+          {% for section in sections %}
+          <option value="{{ section.id }}">{{ section.name }}</option>
+          {% endfor %}
+        </select>
+        <label for="content">New Content:</label>
+        <input type="file" id="content" name="content" />
+      </div>
+
+      <div id="deleteField" style="display: none">
+        <label>Are you sure you want to delete this book?</label>
+        <button type="button" onclick="deleteBook()">Delete Book</button>
+      </div>
+      <button type="submit">Perform Action</button>
+    </form>
+    <h2>Add Book</h2>
+    <form method="POST" enctype="multipart/form-data">
+      <label for="newBookName">Book Name:</label>
+      <input type="text" id="newBookName" name="newBookName" required />
+
+      <label for="newBookSection">Select Section:</label>
+      <select id="newBookSection" name="newBookSection">
+        {% for section in sections %}
+        <option value="{{ section.id }}">{{ section.name }}</option>
+        {% endfor %}
+      </select>
+
+      <label for="newBookContent">Upload Book Content:</label>
+      <input
+        type="file"
+        id="newBookContent"
+        name="newBookContent"
+        required
+        accept=".pdf,.txt,.doc,.docx"
+      />
+
+      <!-- Hidden input field to pass author name -->
+      <input
+        type="hidden"
+        id="authorName"
+        name="authorName"
+        value="{{ author_name }}"
+      />
+
+      <button type="submit">Add Book</button>
+    </form>
+  </body>
+</html>
