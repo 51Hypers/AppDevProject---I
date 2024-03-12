@@ -7,10 +7,18 @@
     <h1>{{ author.username }}'s Books</h1>
     <ul>
       {% for book in books %}
-      <li>{{ book.name }} by {{ book.author }}</li>
+      <li>
+        {{ book.name }} by {{ book.author }}
+        <a
+          href="{{ url_for('static', filename=book.content.replace('static\\', '').replace('\\', '/')) }}"
+          target="_blank"
+          >View</a
+        >
+      </li>
       {% endfor %}
     </ul>
-    <a href="{{ url_for('manage_books', author_name=author.username) }}">Manage Book</a>
-
+    <a href="{{ url_for('manage_books', author_name=author.username) }}"
+      >Manage Book</a
+    >
   </body>
 </html>

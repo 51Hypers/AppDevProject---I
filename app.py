@@ -934,7 +934,6 @@ def author_page(author_name):
 
 @app.route('/manage_books/<author_name>', methods=['GET', 'POST'])
 def manage_books(author_name):
-    # Ensure the current user is the author of the book
     author_books = Book.query.filter_by(author=author_name).all()
     sections = Section.query.all()
 
@@ -1014,6 +1013,7 @@ def manage_books(author_name):
             return redirect(url_for('manage_books', author_name=author_name))
 
     return render_template('author/manage_books.html', author_name=author_name, author_books=author_books, sections=sections)
+
 
 
 
