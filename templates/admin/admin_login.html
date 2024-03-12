@@ -1,47 +1,76 @@
 <!DOCTYPE html>
-<html>
-  <head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login</title>
-  </head>
-  <style>
-    body {
-      /* background: linear-gradient(to right, #24243e, #302b63, #0f0c29); */
-      background-color: #343a40;
-    }
-    .container {
-      background-color: #580000;
-      justify-content: flex-start;
-      align-items: flex-start;
-      /* height: 400px; */
-      padding: 2rem;
-      width: 20%;
-      /* border: 1px solid red; */
-      border-radius: 10px;
-      color: white;
-      margin: 12rem auto;
-    }
-
-    input[type="submit"] {
-      padding: 0.5rem 1rem;
-      margin-top: 1rem;
-      width: 100%;
-    }
-
-    #password {
-      width: 98%;
-    }
-  </style>
-  <body>
+    <style>
+        body {
+            background-color: #343a40;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            background-color: #580000;
+            padding: 2rem;
+            border-radius: 10px;
+            color: white;
+            max-width: 90%;
+            width: 400px;
+            box-shadow: 0 4px 6px rgba(0,0,0,.1);
+        }
+        h1 {
+            margin: 0 0 1.5rem 0;
+            font-size: 1.8rem;
+        }
+        label {
+            display: block;
+            margin-bottom: .5rem;
+        }
+        input[type="password"], input[type="submit"] {
+            width: calc(100% - 1rem);
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #fff;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #ffdd59;
+        }
+        input[type="submit"] {
+            background-color: #580000; /* Red background */
+            color: white;
+            cursor: pointer;
+            border: none;
+            font-weight: bold;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        input[type="submit"]:hover {
+            background-color: #343a40; /* Grey background on hover */
+            color: #ffffff; /* Ensure text color is white for better contrast */
+        }
+        @media (max-width: 420px) {
+            .container {
+                width: 90%;
+                margin: 0 10px;
+            }
+        }
+    </style>
+</head>
+<body>
     <div class="container">
-      <h1>Admin Login</h1>
-      <form method="POST">
-        <label for="password">Password:</label><br />
-        <input type="password" id="password" name="password" required /><br />
-        <input type="submit" value="Login" />
-      </form>
-      {% if error %}
-      <p>{{ error }}</p>
-      {% endif %}
+        <h1>Admin Login</h1>
+        <form method="POST">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            <input type="submit" value="Login">
+        </form>
     </div>
-  </body>
+</body>
 </html>

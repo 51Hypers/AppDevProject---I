@@ -86,11 +86,11 @@ def signup():
             new_user = User(username=username, email=email, password=password, is_librarian=False)
             db.session.add(new_user)
         elif role == 'librarian':
-            new_librarian_request = LibrarianRequest(username=username, email=email, password=password)
+            new_librarian_request = LibrarianRequest(username=username, email=email, password=password, role=role)
             db.session.add(new_librarian_request)
         elif role == 'author':
-            new_user = User(username=username, email=email, password=password, is_librarian=False, is_author=True)
-            db.session.add(new_user)
+            new_author_request = LibrarianRequest(username=username, email=email, password=password, role=role)
+            db.session.add(new_author_request)
         db.session.commit()
         flash('Account created successfully', 'success')
         return redirect(url_for('login'))
@@ -569,7 +569,7 @@ def list_all_users():
 
 @app.route('/users/details', methods=['GET'])
 def view_users_details():
-    users = User.query.filter(User.is_librarian == False, User.is_admin == False).all()
+    users = User.query.filter(User.is_librarian == False, User.is_admin == False, User.is_author == False   ).all()
     if not users:
         return render_template('librarian/user_details.html', message="There are no active users registered.")
 
@@ -681,13 +681,22 @@ def admin_action():
     librarian_request = LibrarianRequest.query.get(librarian_request_id)
 
     if action == 'accept':
-        librarian = User(
-            username=librarian_request.username,
-            email=librarian_request.email,
-            password=librarian_request.password,
-            is_librarian=True
-        )
-        db.session.add(librarian)
+        if librarian_request.role == "librarian":
+            librarian = User(
+                username=librarian_request.username,
+                email=librarian_request.email,
+                password=librarian_request.password,
+                is_librarian=True
+            )
+            db.session.add(librarian)
+        elif librarian_request.role == "author":
+            librarian = User(
+                username=librarian_request.username,
+                email=librarian_request.email,
+                password=librarian_request.password,
+                is_author=True
+            )
+            db.session.add(librarian)
     db.session.delete(librarian_request)
     db.session.commit()
 

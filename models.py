@@ -44,11 +44,13 @@ class LibrarianRequest(db.Model):
     username = Column(String(50), unique=True, nullable=False)
     email = Column(String(100), unique=True, nullable=False)
     password = Column(String(50), nullable=False)
+    role = Column(String(50), nullable=False)
 
-    def __init__(self, username, email, password):
+    def __init__(self, username, email, password, role):
         self.username = username
         self.email = email
         self.password = password
+        self.role = role
 
 class Book(db.Model):
     __table_name__ = "book"

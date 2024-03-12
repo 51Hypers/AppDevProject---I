@@ -1,61 +1,95 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>Admin Panel</title>
     <style>
-      .container {
-        width: 50%;
-        padding: 1rem 8rem;
-        margin: 4rem auto;
-        background-color: #580000;
-        color: white;
-      }
-
-      table {
-        width: 100%;
-      }
-
-      h1 {
-        text-align: center;
-        margin: 2rem auto 5rem auto;
-      }
-
-      body {
-        /* background: linear-gradient(to right, #24243e, #302b63, #0f0c29); */
-        background-color: #343a40;
-      }
+        body {
+            background-color: #343a40;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 60%;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #580000;
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .request-bubble {
+            background-color: #7f0000;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .request-info {
+            font-size: 1rem;
+        }
+        .request-action {
+            display: flex;
+            gap: 10px;
+        }
+        .accept, .reject {
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .accept {
+            background-color: #4CAF50; /* Green */
+        }
+        .reject {
+            background-color: #f44336; /* Red */
+        }
+        .accept:hover, .reject:hover {
+            opacity: 0.8;
+        }
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+                margin: 1rem;
+                padding: 1rem;
+            }
+            .request-action button {
+                padding: 0.5rem;
+            }
+        }
     </style>
-  </head>
-  <body>
+</head>
+<body>
     <div class="container">
-      <h1>Admin Panel</h1>
-      <table>
-        <tr>
-          <th>Username</th>
-          <th>Email</th>
-          <th>Action</th>
-        </tr>
+        <h1>Admin Panel</h1>
         {% for request in librarian_requests %}
-        <tr>
-          <td>{{ request.username }}</td>
-          <td>{{ request.email }}</td>
-          <td>
-            <form method="POST" action="/admin/action">
-              <input
-                type="hidden"
-                name="librarian_request_id"
-                value="{{ request.id }}"
-              />
-              <select name="action">
-                <option value="accept">Accept</option>
-                <option value="reject">Reject</option>
-              </select>
-              <input type="submit" value="Submit" />
-            </form>
-          </td>
-        </tr>
+        <div class="request-bubble">
+            <div class="request-info">
+                <p>Username: {{ request.username }}</p>
+                <p>Email: {{ request.email }}</p>
+                <p>Role: {{ request.role }}</p>
+            </div>
+            <div class="request-action">
+                <form method="POST" action="/admin/action">
+                    <input type="hidden" name="librarian_request_id" value="{{ request.id }}" />
+                    <button type="submit" name="action" value="accept" class="accept">Accept</button>
+                    <button type="submit" name="action" value="reject" class="reject">Reject</button>
+                </form>
+            </div>
+        </div>
         {% endfor %}
-      </table>
     </div>
-  </body>
+</body>
 </html>
