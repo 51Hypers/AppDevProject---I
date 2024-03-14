@@ -3,8 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ book.name }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <style>
+        body {
+            background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
+            color: white;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 100px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 10vh;
+        }
+
+        h1, p {
+            text-align: center;
+        }
+
+        a {
+            background-color: #484282;
+            color: white;
+            padding: 10px 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        a:hover {
+            background-color: #5a579e;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-link {
+            margin-top: 20px;
+            display: inline-block;
+            background-color: transparent;
+            padding: 0;
+            box-shadow: none;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            background-color: transparent;
+            color: #AAA;
+        }
+
+        body {
+            background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
+            color: white;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        nav {
+            background-color: #302b63;
+            position: fixed;
+            width: 0%;
+            top: 0;
+            z-index: 1000;
+        }
+    </style>
 </head>
 <body>
+    <nav>
+        {% include 'dashboards/usernav.html' %}
+    </nav>
+
+    <main style="padding-top: 60px;"> <!-- Added padding to avoid content being hidden behind the navbar -->
+        <h1>{{ book.name }}</h1>
+        <p>Author: {{ book.author }}</p>
+        <p><a href="{{ url_for('print_pdf', filename=book.content.replace('\\', '/')) }}" target="_blank">View PDF</a></p><br>
+        <p><a href="{{ url_for('view_borrowed_books_with_deadlines') }}" target="_blank">Back to Books with Deadlines</a></p>
+    </main>
+
     <script>
         window.addEventListener('DOMContentLoaded', (event) => {
             let errorMessage = '{{ get_flashed_messages(category_filter=["error"])[0] if get_flashed_messages(category_filter=["error"]) }}';
@@ -13,11 +89,5 @@
             }
         });
     </script>
-    <h1>{{ book.name }}</h1>
-    <p>Author: {{ book.author }}</p>
-    <!-- Link to the PDF -->
-    <p><a href="{{ url_for('print_pdf', filename=book.content.replace('\\', '/')) }}" target="_blank">View PDF</a>
-    </p>
-    <a href="{{ url_for('view_borrowed_books_with_deadlines') }}">Back to Books with Deadlines</a>
 </body>
 </html>

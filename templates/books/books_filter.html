@@ -7,6 +7,10 @@
     <title>Filtered Books</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <style>
+        input[type="text"] {
+        color: white;
+        }
+
         body {
             background: linear-gradient( to right, #24243e, #302b63, #0f0c29 );
             color: white;
@@ -65,7 +69,7 @@
                 <input type="text" name="query" id="query" value="{{ query }}">
                 <label for="query">Filter Query</label>
             </div>
-            <button class="btn waves-effect waves-light" type="submit">Filter</button>
+            <button class="btn waves-effect waves-light" type="submit">Search</button>
         </form>
         
         <div class="row">

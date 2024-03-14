@@ -117,6 +117,14 @@
             if (successMessage && successMessage.includes('Request')) {
                 alert(successMessage);
             }
+            let alertMessage = '{{ get_flashed_messages(category_filter=["alert"])[0] if get_flashed_messages(category_filter=["alert"]) }}';
+            if (alertMessage && alertMessage.includes('Feedback')) {
+                alert(alertMessage);
+            }
+            let paymentMessage = '{{ get_flashed_messages(category_filter=["payment_alert"])[0] if get_flashed_messages(category_filter=["payment_alert"]) }}';
+            if (paymentMessage && paymentMessage.includes('Payment')) {
+                alert(paymentMessage);
+            }
       });
   </script>
     {% include 'dashboards/usernav.html' %}
@@ -154,7 +162,7 @@
                   placeholder="Enter your filter query..."
                   id="inputquery"
                 />
-                <button type="submit" class="filterbtn">Filter</button>
+                <button type="submit" class="filterbtn">Apply</button>
               </form>
             </div>
             <a
@@ -162,7 +170,7 @@
               class="btn btn-custom btn-sm"
               >Bought Books</a
             >
-
+              
             <h2>Revoked Books</h2>
             <ul>
               {% for user_book, book in revbook %}

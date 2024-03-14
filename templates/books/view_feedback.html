@@ -1,26 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <title>View Feedback</title>
     <link rel="stylesheet" href="path_to_your_stylesheet.css" />
-  </head>
-  <body>
-    <div class="container">
-      <h1>Feedback for {{ book.name }}</h1>
+    <style>
+        body {
+            background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
+            color: white;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding-top: 50px;
+        }
 
-      <section class="feedback">
-        <h2>Feedback</h2>
-        <ul>
-          {% for fb in feedback %}
-          <li>
-            <p><strong>User:</strong> {{ fb.user.username }}</p>
-            <p><strong>Rating:</strong> {{ fb.rating }}</p>
-            <p><strong>Feedback:</strong> {{ fb.feedback_text }}</p>
-          </li>
-          {% endfor %}
-        </ul>
-      </section>
+        .container {
+            width: 80%;
+            margin: auto;
+            padding: 2rem;
+        }
+
+        h1 {
+            text-align: center;
+            color: #DDD;
+            margin-bottom: 1rem;
+        }
+
+        .feedback {
+            background-color: #393d5c;
+            border-radius: 5px;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+
+        .feedback h2 {
+            color: #AAA;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feedback ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .feedback li {
+            background-color: #302b63;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 5px;
+        }
+
+        .feedback li p {
+            margin: 0.5rem 0;
+        }
+
+        .feedback li p strong {
+            color: #CCC;
+        }
+    </style>
+</head>
+<body>
+    {% include 'dashboards/usernav.html' %}
+    <div class="container">
+        <h1>Feedback for {{ book.name }}</h1>
+        <section class="feedback">
+            <h2>Feedback</h2>
+            <ul>
+                {% for fb in feedback %}
+                <li>
+                    <p><strong>User:</strong> {{ fb.user.username }}</p>
+                    <p><strong>Rating:</strong> {{ fb.rating }}</p>
+                    <p><strong>Feedback:</strong> {{ fb.feedback_text | default('No feedback provided.', true) }}</p>
+                </li>
+                {% else %}
+                <li>No feedback available.</li>
+                {% endfor %}
+            </ul>
+        </section>
     </div>
-  </body>
+</body>
 </html>

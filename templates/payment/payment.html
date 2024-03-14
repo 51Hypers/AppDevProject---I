@@ -4,23 +4,77 @@
     <meta charset="UTF-8" />
     <title>Buy Book</title>
     <script src="https://js.stripe.com/v3/"></script>
+    <style>
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        background-color: #302b63;
+      }
+
+      #payment-form {
+        width: 100%;
+        max-width: 400px;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+
+      #card-element {
+        width: 100%;
+        padding: 10px;
+        padding-right: 0px;
+        padding-left: 2px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        background-color: aliceblue;
+      }
+
+      #card-errors {
+        color: red;
+        margin-bottom: 20px;
+      }
+
+      #submit {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      #submit:hover {
+        background-color: #0056b3;
+      }
+      body {
+        background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
+        color: white;
+      }
+    </style>
   </head>
   <body>
-    <h1>Buy Book</h1>
-    <h2>{{ book.name }}</h2>
-    <p>Author: {{ book.author }}</p>
-    <p>Price: ${{ price }}</p>
+    <div class="container">
+      <h1>Buy Book</h1>
+      <h2>{{ book.name }}</h2>
+      <p>Author: {{ book.author }}</p>
+      <p>Price: ${{ price }}</p>
 
-    <form id="payment-form">
-      <div id="card-element">
-        <!-- A Stripe Element will be inserted here. -->
-      </div>
+      <form id="payment-form">
+        <div id="card-element">
+          <!-- A Stripe Element will be inserted here. -->
+        </div>
 
-      <!-- Used to display form errors. -->
-      <div id="card-errors" role="alert"></div>
+        <!-- Used to display form errors. -->
+        <div id="card-errors" role="alert"></div>
 
-      <button id="submit">Submit Payment</button>
-    </form>
+        <button id="submit">Submit Payment</button>
+      </form>
+    </div>
 
     <script>
       var stripe = Stripe(
@@ -86,7 +140,10 @@
           var errorElement = document.getElementById('card-errors');
           errorElement.textContent = response.error;
         } else {
-          window.location.href = '/payment_success';
+          alert('Payment successful!');
+          setTimeout(function () {
+            window.location.href = '/dashboards/user_dashboard';
+          }, 1000);
         }
       }
     </script>

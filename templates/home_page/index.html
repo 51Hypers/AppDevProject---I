@@ -8,6 +8,18 @@
   <link rel="stylesheet" href="static/styles/home_styles.css" />
 </head>
 <body>
+  <script>
+    window.addEventListener('DOMContentLoaded', (event) => {
+        let errorMessage = '{{ get_flashed_messages(category_filter=["wrapper_flash_admin"])[0] if get_flashed_messages(category_filter=["wrapper_flash_admin"]) }}';
+        if (errorMessage && errorMessage.includes('Admin')) {
+            alert(errorMessage);
+        }
+        let wrapperMessage = '{{ get_flashed_messages(category_filter=["wrapper_flash_user"])[0] if get_flashed_messages(category_filter=["wrapper_flash_user"]) }}';
+            if (wrapperMessage && wrapperMessage.includes('Access')) {
+                alert(wrapperMessage);
+        }
+    });
+</script>
   <div class="left">
     <!-- Corrected the image path here -->
     <img src="static/Cutom_Bg.jpg" alt="Library Background">

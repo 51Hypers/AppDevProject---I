@@ -34,6 +34,10 @@
             if (loginerrorMessage && loginerrorMessage.includes('invalid')) {
                 alert(loginerrorMessage);
             }
+            let wrapperMessage = '{{ get_flashed_messages(category_filter=["wrapper_flash_user"])[0] if get_flashed_messages(category_filter=["wrapper_flash_user"]) }}';
+            if (wrapperMessage && wrapperMessage.includes('Access')) {
+                alert(wrapperMessage);
+            }
         });
     </script>
     <form action="/login" method="post">

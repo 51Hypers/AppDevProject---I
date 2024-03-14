@@ -117,9 +117,10 @@
         <div id="details-{{ loop.index }}" class="user-details">
           <p>Email: {{ user.email}}</p>
           <p>
-            Registered on: {{ user.t_register.strftime('%Y-%m-%d %H:%M:%S') }}
-          </p>
+            Registered on: {{ user.t_register.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+          <p>Role: {{ user.role }}</p>
 
+          {% if not user.is_author %}
           <div class="stats-section">
             <h3>Unapproved Requests</h3>
             {% for request in user.unapproved_requests %}
@@ -189,8 +190,8 @@
             <p class="no-data">All books returned.</p>
             {% endfor %}
           </div>
-
-          {% if user.is_author %}
+          
+          {% else %}
           <div class="stats-section">
             <h3>Authored Books</h3>
             {% if user.authored_books %}

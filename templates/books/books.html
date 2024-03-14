@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="path_to_your_stylesheet.css" />
   </head>
   <style>
+    
     .navbar {
       left: 8% !important;
     }
@@ -108,7 +109,11 @@
         </select>
         <button type="submit" class="sort-btn">Sort</button>
       </form>
-
+      {% if request.args.get('flashed_message') == 'book_already_purchased' %}
+      <script>
+          alert('You have already purchased this book');
+      </script>
+{% endif %}
       <section class="books" style="padding: 1rem 2rem">
         <h2>Books</h2>
         <table style="width: 100%">
@@ -143,10 +148,10 @@
                   >View Feedback</a
                 >
               </td>
-              <td>
+              <td class="btn">
                 <a
                   href="{{ url_for('buy_book', book_id=book.id) }}"
-                  class="btn-a btn-buy"
+                  class="btn-a btn-req"
                   >Buy Book</a
                 >
               </td>
