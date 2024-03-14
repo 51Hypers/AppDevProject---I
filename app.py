@@ -550,6 +550,9 @@ def view_users_details():
         user.unreturned_books = UserBook.query.filter_by(user_id=user.id, is_approved=True, t_return=None).all()
         user.book_details = [{'id': request.book_id, 'name': request.book.name} for request in user.unapproved_requests + user.approved_requests + user.rejected_requests + user.returned_books + user.unreturned_books]
 
+    if user.is_author:
+        user.authored_books = Book.query.filter_by(Book.author == user).all()
+
     return render_template('librarian/user_details.html', users=users)
 
 

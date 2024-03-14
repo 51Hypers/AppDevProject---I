@@ -189,6 +189,21 @@
             <p class="no-data">All books returned.</p>
             {% endfor %}
           </div>
+
+          {% if user.is_author %}
+          <div class="stats-section">
+            <h3>Authored Books</h3>
+            {% if user.authored_books %}
+              {% for book in user.authored_books %}
+              <div class="request-info">
+                <p>Book Title: {{ book.name }}, Book ID: {{ book.id }}</p>
+              </div>
+              {% endfor %}
+            {% else %}
+            <p class="no-data">This author has not authored any books.</p>
+            {% endif %}
+          </div>
+          {% endif %}
         </div>
       </div>
       <!-- Closing user-container -->

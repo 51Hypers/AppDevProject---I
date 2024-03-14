@@ -1,27 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Library System</title>
-    <link rel="stylesheet" href="static/styles/home_styles.css" />
-  </head>
-  <body>
-    <div class="left">
-      <img src="Project\static\Cutom_Bg.jpg" alt="Project\static\Cutom_Bg.jpg">
-    </div>
-    <div class="right">
-      <h1>Welcome to the Library System</h1>
-      <p>
-        Welcome to the Library Management System. Log in to access your account, manage loans, and explore our collection.
-      </p>
-  
-      <ul>
-        <li><a href="{{ url_for('login') }}">Login</a></li>
-        <li><a href="{{ url_for('signup') }}">Signup</a></li>
-      </ul>
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Library System</title>
+  <link rel="stylesheet" href="static/styles/home_styles.css" />
+</head>
+<body>
+  <div class="left">
+    <!-- Corrected the image path here -->
+    <img src="static/Cutom_Bg.jpg" alt="Library Background">
+  </div>
+  <div class="right">
+    <h1>Welcome to the Library System</h1>
+    <p>
+      Welcome to the Library Management System. Log in to access your account, manage books, and explore our collection.
+    </p>
 
-    </div>
-  </body>
+    <ul>
+      <li><a href="{{ url_for('login') }}">Login</a></li>
+      <li><a href="{{ url_for('signup') }}">Signup</a></li>
+    </ul>
+
+  </div>
+</body>
 </html>
