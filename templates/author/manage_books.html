@@ -176,6 +176,6 @@
 
       <button type="submit">Add Book</button>
     </form>
-    <a href="author.html" class="back-button">Back to Author</a>
+    <a href="{{ url_for('author_page', author_name=author_name) }}" class="back-button">Back to Author</a>
   </body>
 </html>
