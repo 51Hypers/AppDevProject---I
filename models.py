@@ -15,7 +15,7 @@ class User(db.Model):
     t_register = Column(DateTime, default=datetime.utcnow)
     is_librarian = Column(Boolean, default=False)
     is_admin = Column(Boolean, default=False)
-    is_author = Column(Boolean, default=False)  # New column for indicating if user is an author
+    is_author = Column(Boolean, default=False) 
 
     user_books = db.relationship('UserBook', back_populates='user', lazy=True)
 
@@ -59,7 +59,7 @@ class Book(db.Model):
     content = Column(Text, nullable=False)
     author = Column(String(100), nullable=False)
     section_id = Column(Integer, ForeignKey('section.id'), nullable=False)
-    price = Column(Integer)  # Assuming price is an integer
+    price = Column(Integer)  
 
     def __init__(
             self, id: int = None, name: str = None, content: str = None, author: str = None, section_id: int = None, price: int = None
@@ -100,7 +100,7 @@ class UserBook(db.Model):
     t_deadline = Column(DateTime, nullable=True)
     is_approved = Column(Boolean, default=False)
     is_rejected = Column(Boolean, default=False)
-    is_revoked = Column(Boolean, default=False)  # New column for revoking access
+    is_revoked = Column(Boolean, default=False) 
 
     def __init__(
             self, id: int = None, user_id: int = None, book_id: int = None, t_request: datetime = None, t_return: datetime = None, is_approved: bool = None, is_rejected: bool = None, is_revoked: bool = None

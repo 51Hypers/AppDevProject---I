@@ -7,6 +7,7 @@ import os
 app = Flask(__name__)
 UPLOAD_FOLDER = 'static\pdfs'
 
+app.secret_key = 'libralads'
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///library.db"
 app.config["SECRET_KEY"] = "427a3ec270bc25fe4e143d65f43f3f72"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False

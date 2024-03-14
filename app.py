@@ -3,29 +3,37 @@ from io import BytesIO
 import os
 import pandas as pd
 from matplotlib import pyplot as plt
-from sqlalchemy import Null, or_
 from nit import app, db
-from flask import abort, render_template, render_template_string, request, redirect, send_file, url_for, session, flash
+from flask import abort, render_template, render_template_string, request, redirect, send_file, url_for, session, flash, Flask, jsonify
 from models import User, Section, Book, UserBook, Feedback
 from sqlalchemy.orm.exc import NoResultFound
 from models import LibrarianRequest,PayInfo
 from datetime import datetime, timedelta
 from sqlalchemy.exc import IntegrityError
-from flask import Flask, jsonify
 from sqlalchemy import func
-# DECORATORS
-from flask import redirect, url_for, session
 from functools import wraps
 from werkzeug.utils import secure_filename
 ALLOWED_EXTENSIONS = {'pdf'}
 UPLOAD_FOLDER = 'static\pdfs'
 
-def login_required(f):
+
+# Decorators
+def loged_in_user(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'user_id' not in session:
-            flash('Please log in to access this page.', 'error')
+        if 'user_id' not in session or not session:
+            flash('Access Denied! Login Required!', 'error')
             return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+def loged_in_admin(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session.get('admin') != True:  # Checks if the admin flag in the session is not True
+            flash('Admin access required. Please log in as an admin.', 'error')
+            return redirect(url_for('admin'))  # Redirect to admin login page
         return f(*args, **kwargs)
     return decorated_function
 
@@ -53,15 +61,15 @@ def login():
             session['user_id'] = user.id
 
             if user.is_admin:
-                return redirect(url_for('admin_dashboard'))  # Ensure the URL is correct
+                return redirect(url_for('admin_dashboard'))  
             elif user.is_librarian:
-                return redirect(url_for('librarian_dashboard'))  # Ensure the URL is correct
+                return redirect(url_for('librarian_dashboard'))  
             elif user.is_author:
-                return redirect(url_for('author_page', author_name=username))  # Redirect to author page with author's username
+                return redirect(url_for('author_page', author_name=username)) 
             else:
-                return redirect(url_for('user_dashboard'))  # Ensure the URL is correct
+                return redirect(url_for('user_dashboard'))  
         else:
-            flash('User does not exist or invalid credentials', 'error')  # Corrected the flow here
+            flash('User does not exist or invalid credentials', 'error')  
             return redirect(url_for('login'))
 
 
@@ -100,6 +108,7 @@ def signup():
 @app.route('/logout')
 def logout():
     session.pop('username', None)
+    session.pop('user_id', None)
     return redirect(url_for('index'))
 
 
@@ -108,6 +117,7 @@ from operator import itemgetter
 
 # BOOKS VIEWS
 @app.route('/dashboards/user_dashboard')
+@loged_in_user
 def user_dashboard():
     user_id = session.get('user_id')
     if not user_id:
@@ -140,6 +150,7 @@ def user_dashboard():
 
 
 @app.route('/books', methods=['GET'])
+@loged_in_user
 def list_all_books():
     sort_by = request.args.get('sort_by', default='name_asc')
 
@@ -162,7 +173,6 @@ def list_all_books():
     elif sort_column == 'rating':
         sort_key = func.avg(Feedback.rating)
     else:
-        # Default sorting
         sort_key = Book.name
 
     if sort_order == 'asc':
@@ -179,6 +189,7 @@ def list_all_books():
 
 #view feedback
 @app.route('/books/<int:book_id>/feedback', methods=['GET'])
+@loged_in_user
 def view_feedback(book_id):
     book = Book.query.get(book_id)
     if not book:
@@ -190,6 +201,7 @@ def view_feedback(book_id):
 
 
 @app.route('/books/filter', methods=['GET'])
+@loged_in_user
 def list_books_by_filter():
     filter_type = request.args.get('filter_type', 'all')
     query = request.args.get('query', '')
@@ -214,12 +226,14 @@ def list_books_by_filter():
 
 
 @app.route('/books/view/<book_id>', methods=['GET'])
+@loged_in_user
 def view_book_details(book_id: int):
     book = db.session.query(Book).filter(Book.id == book_id).one()
     return render_template('books/book_view.html', book=book)
 
 
 @app.route('/my_books', methods=['GET'])
+@loged_in_user
 def view_borrowed_books():
     user_id = session.get('user_id')
     if not user_id:
@@ -231,32 +245,30 @@ def view_borrowed_books():
 
 
 @app.route('/books/request/<int:book_id>', methods=['POST', 'GET'])
+@loged_in_user
 def request_book(book_id):
-    user_id = session.get('user_id')  # Assuming `current_user` keeps track of the logged-in user
+    user_id = session.get('user_id')  
     current_data = datetime.utcnow()
 
-    # Check if the user has already requested the maximum number of books
     active_requests = UserBook.query.filter_by(user_id=user_id, is_returned=False).count()
     if active_requests >= 5:
         flash('You have reached the maximum number of book requests.', 'error')
         return redirect(url_for('list_all_books'))
 
-    # Check if the book is already requested and not returned
     book_request = UserBook.query.filter_by(book_id=book_id, user_id=user_id, is_returned=False).first()
     if book_request:
         flash('You have already requested this book.', 'error')
         return redirect(url_for('list_all_books'))
 
-    # Create a new book request
     new_request = UserBook(user_id=user_id, book_id=book_id)
     db.session.add(new_request)
     db.session.commit()
  
-    # flash('Book request submitted successfully!', 'success')
     return render_template_string('<h1> Request Submission Successful!<h1>')
 
 
 @app.route('/books/deadlines')
+@loged_in_user
 def view_borrowed_books_with_deadlines():
     user_id = session.get('user_id')
     if not user_id:
@@ -279,7 +291,7 @@ def view_borrowed_books_with_deadlines():
 
         books_with_deadlines.append({
             'user_book_id': user_book.id,
-            'book_id': book.id,  # Include the book_id here
+            'book_id': book.id, 
             'book_name': book.name,
             'deadline': user_book.t_deadline.isoformat() if user_book.t_deadline else None,
             'days_until_deadline': days_until_deadline
@@ -289,6 +301,7 @@ def view_borrowed_books_with_deadlines():
 
 #bookview
 @app.route('/books/view/<int:book_id>', methods=['GET'])
+@loged_in_user
 def view_book(book_id):
     book = Book.query.get(book_id)
     if not book:
@@ -298,13 +311,13 @@ def view_book(book_id):
     return render_template('books/view_book.html', book=book)
 
 @app.route('/requested_books')
+@loged_in_user
 def requested_books():
     user_id = session.get('user_id')
     if not user_id:
         flash('Please log in to view requested books.', 'error')
         return redirect(url_for('login'))
 
-    # Query for books that the current user has requested and are awaiting approval
     requested_books = db.session.query(UserBook, Book).join(Book)\
                   .filter(UserBook.user_id == user_id, UserBook.is_approved == False, UserBook.is_rejected == False, UserBook.t_return == None, UserBook.t_deadline == None).all()
     print(requested_books)
@@ -313,6 +326,7 @@ def requested_books():
 
 
 @app.route('/books/finished')
+@loged_in_user
 def view_finished_books():
     user_id = session.get('user_id')
     if not user_id:
@@ -325,6 +339,7 @@ def view_finished_books():
 
 
 @app.route('/books/finished/by-section')
+@loged_in_user
 def view_finished_books_by_section():
     user_id = session.get('user_id')
     if not user_id:
@@ -333,7 +348,6 @@ def view_finished_books_by_section():
 
     finished_books = db.session.query(UserBook, Book, Section).join(Book, UserBook.book_id == Book.id).join(Section, Book.section_id == Section.id).filter(UserBook.user_id == user_id, UserBook.t_return != None).all()
     
-    # Organizing books by their sections
     books_by_section = {}
     for user_book, book, section in finished_books:
         if section.name not in books_by_section:
@@ -344,15 +358,15 @@ def view_finished_books_by_section():
 
 
 @app.route('/user/stats')
+@loged_in_user
 def user_stats():
     user_id = session.get('user_id')
     if not user_id:
         flash('Please login', 'error')
-        return redirect(url_for('login'))  # Assuming there's a 'login' view to redirect to
+        return redirect(url_for('login'))  
 
     user_books = UserBook.query.filter(UserBook.user_id == user_id, UserBook.t_return != None).all()
     if not user_books:
-        # If no books have been finished, return a message indicating no data is available
         return render_template_string("<h1>No User Data Available!</h1>")
 
     books = [Book.query.get(ub.book_id) for ub in user_books if ub.t_return is not None]
@@ -388,16 +402,14 @@ def user_stats():
 
 
 @app.route('/books/return/<int:userbook_id>', methods=['POST'])
+@loged_in_user
 def return_book(userbook_id):
     userbook = db.session.query(UserBook).filter_by(id=userbook_id).first()
     if userbook:
-        # Book is being returned now
         userbook.t_return = datetime.utcnow()
         userbook.t_deadline = datetime.utcnow() + timedelta(days=14)
 
-        # Check if the book is returned after the deadline
         if datetime.utcnow() > userbook.t_deadline:
-            # Setting is_approved to 0 to indicate revoking borrowing privileges due to late return
             userbook.is_approved = 0
             flash('Returned late. Borrowing privileges have been revoked.', 'error')
         else:
@@ -416,6 +428,7 @@ def return_book(userbook_id):
 
 # LIBRARIAN VIEWS
 @app.route('/dashboards/librarian_dashboard')
+@loged_in_user
 def librarian_dashboard():
     borrowed_books = db.session.query(UserBook, Book, User).join(Book, UserBook.book_id == Book.id).join(User, UserBook.user_id == User.id).filter(UserBook.t_return == None, UserBook.is_approved == True, User.is_librarian == False, User.is_admin == False).all()
     now = datetime.utcnow()
@@ -440,12 +453,13 @@ def librarian_dashboard():
 
 
 @app.route('/manage', methods=['GET', 'POST'])
+@loged_in_user
 def manage():
     if request.method == 'POST':
         action = request.form.get('action')
         if action == 'add_book':
             name = request.form.get('name')
-            file = request.files['content']  # Adjusted to handle file
+            file = request.files['content'] 
             author = request.form.get('author')
             section_id = request.form.get('section_id')
 
@@ -513,61 +527,15 @@ def manage():
     return render_template('librarian/manage.html',sections=sections)
 
 
-from flask import Flask, render_template, request, redirect, url_for
-from sqlalchemy.exc import IntegrityError
-
-# @app.route('/manage/edit_book/<int:book_id>', methods=['GET', 'POST'])
-# def edit_or_delete_book(book_id):
-#     book = Book.query.get(book_id)
-#     sections = Section.query.all()
-
-#     if not book:
-#         return 'Book not found', 404
-
-#     if request.method == 'POST':
-#         action = request.form.get('action')
-
-#         if action == 'edit_book':
-#             name = request.form.get('name')
-#             content = request.form.get('content')
-#             author = request.form.get('author')
-#             section_id = request.form.get('section_id')
-
-#             if not all([name, content, author, section_id]):
-#                 return 'Missing data', 400
-
-#             try:
-#                 book.name = name
-#                 book.content = content
-#                 book.author = author
-#                 book.section_id = section_id
-#                 db.session.commit()
-#                 return 'Book updated successfully', 200
-#             except IntegrityError:
-#                 db.session.rollback()
-#                 return 'Error updating book', 500
-
-#         elif action == 'delete_book':
-#             try:
-#                 db.session.delete(book)
-#                 db.session.commit()
-#                 return 'Book deleted successfully', 200
-#             except:
-#                 db.session.rollback()
-#                 return 'Error deleting book', 500
-
-#     return render_template('books/edit_books.html', book=book, sections=sections)
-
-
-
-
 @app.route('/user', methods=['GET'])
+@loged_in_user
 def list_all_users():
     users = db.session.query(User).filter(User.is_librarian == False).filter(User.is_admin == False).all()
     return render_template('librarian/all_users.html', users=users)
 
 
 @app.route('/users/details', methods=['GET'])
+@loged_in_user
 def view_users_details():
     users = User.query.filter(User.is_librarian == False, User.is_admin == False, User.is_author == False   ).all()
     if not users:
@@ -585,6 +553,7 @@ def view_users_details():
 
 
 @app.route('/requests', methods=['GET'])
+@loged_in_user
 def list_all_requests():
     unapproved_requests = db.session.query(UserBook).join(Book, Book.id == UserBook.book_id).join(User, User.id == UserBook.user_id).filter(UserBook.is_approved == False, UserBook.is_rejected == False,UserBook.t_return==None).all()
     rejected_requests = db.session.query(UserBook).join(Book, Book.id == UserBook.book_id).join(User, User.id == UserBook.user_id).filter(UserBook.is_rejected == True).all()
@@ -592,6 +561,7 @@ def list_all_requests():
 
 
 @app.route('/stats')
+@loged_in_user
 def get_books_stats():
     requested_books = UserBook.query.filter_by(is_approved=False, is_rejected=False, t_return=None, t_deadline=None).all()
     borrowed_books = UserBook.query.filter(
@@ -607,15 +577,17 @@ def get_books_stats():
 
 #revoke
 @app.route('/revoke_book/<int:userbook_id>', methods=['POST'])
+@loged_in_user
 def revoke_book(userbook_id):
     userbook = UserBook.query.get(userbook_id)
     userbook.is_revoked = True
     db.session.commit()
-    flash('Book revoked successfully', 'success')  # Optionally, provide a notification
+    flash('Book revoked successfully', 'success') 
     return redirect(url_for('get_books_stats'))
 
 
 @app.route('/request/<action>', methods=['POST'])
+@loged_in_user
 def approve_book_request(action: str):
     userbook_id = request.form['userbook_id']
     userbook: UserBook = db.session.query(UserBook).filter(UserBook.id == userbook_id).one()
@@ -626,6 +598,7 @@ def approve_book_request(action: str):
     return redirect(url_for('list_all_requests'))
 
 @app.route('/add-book', methods=['GET', 'POST'])
+@loged_in_user
 def add_book():
     if request.method == 'GET':
         return render_template('librarian/add_book.html')
@@ -643,6 +616,7 @@ def add_book():
         return redirect(url_for(f'books/view/{book.id}'))
 
 @app.route('/add-section', methods=['GET', 'POST'])
+@loged_in_user
 def add_section():
     if request.method == 'GET':
         return render_template('librarian/add_book.html')
@@ -665,16 +639,20 @@ def add_section():
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
     if request.method == 'GET':
-        return render_template('admin/admin_login.html')  # Admin login form
+        return render_template('admin/admin_login.html')  
     else:
         password = request.form['password']
-        if password == '1':  # Replace 'your_admin_password' with your actual admin password
+        if password == '1':  # ADMIN password
+            session['admin'] = True
             librarian_requests = LibrarianRequest.query.all()
             return render_template('admin/admin_panel.html', librarian_requests=librarian_requests)
         else:
-            return render_template('admin/admin_login.html', error='Invalid password')
+            flash("Access Denied! Wrong ADMIN Password!")
+            return render_template('home_page/login.html', error='Invalid password')
+
 
 @app.route('/admin/action', methods=['POST'])
+@loged_in_admin
 def admin_action():
     action = request.form['action']
     librarian_request_id = request.form['librarian_request_id']
@@ -751,9 +729,13 @@ def sections_of_interest_chart():
 
 #feedback
 @app.route('/give_feedback/<int:book_id>', methods=['GET'])
+@loged_in_user
 def give_feedback(book_id):
     return render_template('users/feedback_form.html', book_id=book_id)
+
+
 @app.route('/submit_feedback', methods=['POST'])
+@loged_in_user
 def submit_feedback():
     user_id = session.get('user_id')
     if not user_id:
@@ -783,8 +765,8 @@ app.config['STRIPE_SECRET_KEY'] = 'sk_test_51Oot5iSJwEJZXRKmlcmfonrTALj0QQjlzWSi
 
 stripe.api_key = app.config['STRIPE_SECRET_KEY']
 @app.route('/buy_book/<int:book_id>', methods=['GET', 'POST'])
+@loged_in_user
 def buy_book(book_id):
-    # Retrieve the book from the database
     user_id = session.get('user_id')
     book = Book.query.get(book_id)
     user = User.query.get(user_id)
@@ -792,7 +774,7 @@ def buy_book(book_id):
         return 'Book not found', 404
 
     # Constant price for the book
-    book_price = book.price  # Example price, replace with actual constant price
+    book_price = book.price  
 
     if request.method == 'POST':
         try:
@@ -833,15 +815,18 @@ def buy_book(book_id):
     return render_template('payment/payment.html', book=book, price=book_price)
 
 @app.route('/payment_success')
+@loged_in_user
 def payment_success():
     return render_template('payment/succ.html')
 
 @app.route('/payment_failed')
+@loged_in_user
 def payment_failed():
     return render_template('payment/fail.html')
 
 
 @app.route('/bought')
+@loged_in_user
 def bought():
     user_id = session.get('user_id')
     if not user_id:
@@ -859,13 +844,14 @@ def allowed_file(filename):
 
 
 @app.route('/manage/edit_book/<int:book_id>', methods=['GET', 'POST'])
+@loged_in_user
 def edit_or_delete_book(book_id):
     book = Book.query.get(book_id)
     sections = Section.query.all()
 
     if not book:
         flash('Book not found', 'error')
-        return redirect(url_for('your_book_listing_function'))  # Adjust to your book listing function
+        return redirect(url_for('your_book_listing_function'))  
 
     if request.method == 'POST':
         action = request.form.get('action')
@@ -909,13 +895,14 @@ def edit_or_delete_book(book_id):
                 db.session.rollback()
                 flash('Error deleting book', 'error')
 
-        return redirect(request.url)  # Redirect back to the same edit page
+        return redirect(request.url)  
 
     return render_template('books/edit_books.html', book=book, sections=sections)
 
 
 
 @app.route('/<path:filename>')
+@loged_in_user
 def print_pdf(filename):
     base_dir = os.path.join(app.root_path, 'static', 'pdfs')  # Base directory for PDFs
 
@@ -931,8 +918,8 @@ def print_pdf(filename):
 
 #author
 @app.route('/author/<author_name>')
+@loged_in_user
 def author_page(author_name):
-    # Query the books database to get books uploaded by the author
     author_books = Book.query.filter_by(author=author_name).all()
     author = User.query.filter_by(username=author_name).first()
 
@@ -941,7 +928,9 @@ def author_page(author_name):
 
     return render_template('author/author.html', author=author, books=author_books)
 
+
 @app.route('/manage_books/<author_name>', methods=['GET', 'POST'])
+@loged_in_user
 def manage_books(author_name):
     author_books = Book.query.filter_by(author=author_name).all()
     sections = Section.query.all()
@@ -1024,19 +1013,5 @@ def manage_books(author_name):
     return render_template('author/manage_books.html', author_name=author_name, author_books=author_books, sections=sections)
 
 
-
-
-
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-
-
-
-
-
-
-
-
-
