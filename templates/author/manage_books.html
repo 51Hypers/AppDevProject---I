@@ -69,6 +69,23 @@
       #deleteField button:hover {
           background-color: #B71C1C; /* Darker red on hover */
       }
+
+      .back-button {
+            display: block;
+            width: fit-content;
+            margin: 0 auto 20px; /* Centered and added margin at the bottom */
+            padding: 10px 20px;
+            background-color: #FFA000; /* Amber color to match headings */
+            color: white;
+            text-decoration: none;
+            border-radius: 20px; /* Consistent with button styles */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Light shadow for depth */
+        }
+
+        .back-button:hover {
+            background-color: #FB8C00; /* Slightly darker on hover */
+            transform: translateY(-2px); /* Consistent raise effect */
+        }
   </style>
     <script>
       function toggleEditFields() {
@@ -159,5 +176,6 @@
 
       <button type="submit">Add Book</button>
     </form>
+    <a href="author.html" class="back-button">Back to Author</a>
   </body>
 </html>

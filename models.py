@@ -21,7 +21,7 @@ class User(db.Model):
     user_books = db.relationship('UserBook', back_populates='user', lazy=True)
 
     def __init__(
-            self, id: str = None, username: str = None, password: str = None, email: str = None, t_register: datetime = None, is_librarian: bool = None, is_admin: bool = None, is_author: bool = None
+            self, id: str = None, username: str = None, password: str = None, email: str = None, t_register: datetime = None, is_librarian: bool = None, is_admin: bool = None, is_author: bool = None, role: str = None
     ) -> None:
         self.id = id
         self.username = username
@@ -31,6 +31,8 @@ class User(db.Model):
         self.is_librarian = is_librarian
         self.is_admin = is_admin
         self.is_author = is_author
+        self.role = role
+
     def grant_librarian_access(self):
         self.is_librarian = True
         db.session.commit()
