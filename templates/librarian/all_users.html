@@ -74,7 +74,8 @@
         <ul class="list-group">
           {% for user in users %}
           <li class="list-group-item">
-            <strong>Username:</strong> {{ user.username }}<br />
+            <strong>Username:</strong> {{ user.username }}<br>
+            <strong>Role:</strong> {{ user.role }}<br>
             <strong>ID:</strong> {{ user.id }}, <strong>Email:</strong> {{
             user.email }}
           </li>

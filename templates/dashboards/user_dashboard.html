@@ -107,6 +107,18 @@
     </style>
   </head>
   <body>
+    <script>
+      window.addEventListener('DOMContentLoaded', (event) => {
+          let warningMessage = '{{ get_flashed_messages(category_filter=["warning"])[0] if get_flashed_messages(category_filter=["warning"]) }}';
+          if (warningMessage && warningMessage.includes('books')) {
+              alert(warningMessage);
+          }
+          let successMessage = '{{ get_flashed_messages(category_filter=["success"])[0] if get_flashed_messages(category_filter=["success"]) }}';
+            if (successMessage && successMessage.includes('Request')) {
+                alert(successMessage);
+            }
+      });
+  </script>
     {% include 'dashboards/usernav.html' %}
     <div class="container" style="padding-top: 6rem">
       <h2 class="text-center my-4">User Dashboard</h2>

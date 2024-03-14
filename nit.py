@@ -34,7 +34,7 @@ def populate():
         db.session.add(section)
         db.session.commit()
         used_files = set()
-        for _ in range(0, 12):
+        for _ in range(0, 5):
             pdf_file = random.choice(pdf_files)
             while pdf_file in used_files:
                 pdf_file = random.choice(pdf_files)

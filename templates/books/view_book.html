@@ -5,6 +5,14 @@
     <title>{{ book.name }}</title>
 </head>
 <body>
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            let errorMessage = '{{ get_flashed_messages(category_filter=["error"])[0] if get_flashed_messages(category_filter=["error"]) }}';
+            if (errorMessage && errorMessage.includes('Book')) {
+                alert(errorMessage);
+            }
+        });
+    </script>
     <h1>{{ book.name }}</h1>
     <p>Author: {{ book.author }}</p>
     <!-- Link to the PDF -->

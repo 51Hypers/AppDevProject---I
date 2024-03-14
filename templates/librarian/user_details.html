@@ -92,6 +92,14 @@
     </style>
   </head>
   <body>
+    <script>
+      window.addEventListener('DOMContentLoaded', (event) => {
+          let errorMessage = '{{ get_flashed_messages(category_filter=["error"])[0] if get_flashed_messages(category_filter=["error"]) }}';
+          if (errorMessage && errorMessage.includes('active')) {
+              alert(errorMessage);
+          }
+      });
+  </script>
     {% include 'dashboards/navbar.html' %}
     <div class="container">
       <div class="page-header">

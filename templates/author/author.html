@@ -85,8 +85,7 @@
       </li>
       {% endfor %}
     </ul>
-    <a href="{{ url_for('manage_books', author_name=author.username) }}"
-      >Manage Book</a
-    >
+    <a href="{{ url_for('manage_books', author_name=author.username) }}">Manage Book</a>
+    <a href="{{ url_for('logout') }}">Logout</a>
   </body>
 </html>

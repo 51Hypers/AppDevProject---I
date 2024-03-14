@@ -76,6 +76,18 @@
     }
   </style>
   <body onload="setSortBy()">
+    <script>
+      window.addEventListener('DOMContentLoaded', (event) => {
+          let errorMessage = '{{ get_flashed_messages(category_filter=["error"])[0] if get_flashed_messages(category_filter=["error"]) }}';
+          if (errorMessage && errorMessage.includes('book')) {
+              alert(errorMessage);
+          }
+        let successMessage = '{{ get_flashed_messages(category_filter=["success"])[0] if get_flashed_messages(category_filter=["success"]) }}';
+        if (successMessage && successMessage.includes('Successful')) {
+          alert(successMessage);
+    }
+  });
+  </script>
     {% include 'dashboards/usernav.html' %}
     <div class="container" style="padding: 8rem 20rem">
       <h1>Books List</h1>

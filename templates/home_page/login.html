@@ -20,15 +20,22 @@
 
 <div class="login-container">
     <h2>Login</h2>
-    <!-- Display flashed messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category, message in messages %}
-        <div class="error-message">{{ message }}</div>
-        {% endfor %}
-    {% endif %}
-    {% endwith %}
-
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            let successMessage = '{{ get_flashed_messages(category_filter=["success"])[0] if get_flashed_messages(category_filter=["success"]) }}';
+            if (successMessage && successMessage.includes('created')) {
+                alert(successMessage);
+            }
+            let adminMessage = '{{ get_flashed_messages(category_filter=["admin"])[0] if get_flashed_messages(category_filter=["admin"]) }}';
+            if (adminMessage && adminMessage.includes('ADMIN')) {
+                alert(adminMessage);
+            }
+            let loginerrorMessage = '{{ get_flashed_messages(category_filter=["login_error"])[0] if get_flashed_messages(category_filter=["login_error"]) }}';
+            if (loginerrorMessage && loginerrorMessage.includes('invalid')) {
+                alert(loginerrorMessage);
+            }
+        });
+    </script>
     <form action="/login" method="post">
         <div class="form-group">
             <label for="username">Username</label>

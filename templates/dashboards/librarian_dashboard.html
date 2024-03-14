@@ -70,6 +70,14 @@
     </style>
   </head>
   <body>
+    <script>
+      window.addEventListener('DOMContentLoaded', (event) => {
+          let errorMessage = '{{ get_flashed_messages(category_filter=["warning"])[0] if get_flashed_messages(category_filter=["warning"]) }}';
+          if (errorMessage && errorMessage.includes('Warning')) {
+              alert(errorMessage);
+          }
+      });
+  </script>
     {% include 'dashboards/navbar.html' %}
     <h2>Welcome to the Librarian Dashboard</h2>
     <p>

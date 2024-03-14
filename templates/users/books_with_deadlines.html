@@ -54,6 +54,22 @@
     </style>
   </head>
   <body>
+    <script>
+      window.addEventListener('DOMContentLoaded', (event) => {
+          let errorMessage = '{{ get_flashed_messages(category_filter=["error"])[0] if get_flashed_messages(category_filter=["error"]) }}';
+          if (errorMessage && errorMessage.includes('return')) {
+              alert(errorMessage);
+          }
+          let errorMessage_2 = '{{ get_flashed_messages(category_filter=["error"])[0] if get_flashed_messages(category_filter=["error"]) }}';
+          if (errorMessage_2 && errorMessage_2.includes('Returned')) {
+              alert(errorMessage_2);
+          }
+          let successMessage = '{{ get_flashed_messages(category_filter=["success"])[0] if get_flashed_messages(category_filter=["success"]) }}';
+        if (successMessage && successMessage.includes('Book')) {
+            alert(successMessage);
+        }
+      });
+  </script>
     {% include 'dashboards/usernav.html' %}
     <div class="container">
       <h1>Borrowed Books</h1>

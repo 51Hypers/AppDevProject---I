@@ -69,7 +69,7 @@ def login():
             else:
                 return redirect(url_for('user_dashboard'))  
         else:
-            flash('User does not exist or invalid credentials', 'error')  
+            flash('User does not exist or invalid credentials', 'login_error')  
             return redirect(url_for('login'))
 
 
@@ -91,7 +91,7 @@ def signup():
             return render_template('home_page/signup.html')
 
         if role == 'user':
-            new_user = User(username=username, email=email, password=password, is_librarian=False)
+            new_user = User(username=username, email=email, password=password, is_librarian=False, role=role)
             db.session.add(new_user)
         elif role == 'librarian':
             new_librarian_request = LibrarianRequest(username=username, email=email, password=password, role=role)
@@ -102,7 +102,6 @@ def signup():
         db.session.commit()
         flash('Account created successfully', 'success')
         return redirect(url_for('login'))
-
 
 
 @app.route('/logout')
@@ -248,14 +247,13 @@ def view_borrowed_books():
 @loged_in_user
 def request_book(book_id):
     user_id = session.get('user_id')  
-    current_data = datetime.utcnow()
 
     active_requests = UserBook.query.filter_by(user_id=user_id, is_returned=False).count()
     if active_requests >= 5:
         flash('You have reached the maximum number of book requests.', 'error')
         return redirect(url_for('list_all_books'))
 
-    book_request = UserBook.query.filter_by(book_id=book_id, user_id=user_id, is_returned=False).first()
+    book_request = UserBook.query.filter(UserBook.user_id == user_id, UserBook.is_approved == False, UserBook.is_rejected == False, UserBook.t_return == None, UserBook.t_deadline == None).first()
     if book_request:
         flash('You have already requested this book.', 'error')
         return redirect(url_for('list_all_books'))
@@ -264,7 +262,8 @@ def request_book(book_id):
     db.session.add(new_request)
     db.session.commit()
  
-    return render_template_string('<h1> Request Submission Successful!<h1>')
+    flash('Request Successful!', 'success')
+    return redirect(url_for('user_dashboard'))
 
 
 @app.route('/books/deadlines')
@@ -444,7 +443,7 @@ def librarian_dashboard():
 
     if books_revoked:
         db.session.commit()
-        flash('Access has been revoked for overdue books borrowed by users. Please ensure they are returned.', 'warning')
+        flash('Warning: Access has been revoked for overdue books borrowed by users. Please ensure they are returned.', 'warning')
     
     if deadline_warning_issued:
         flash('Warning: Some users have borrowed books that are due within the next day. Please remind them to return on time.', 'warning')
@@ -479,9 +478,9 @@ def manage():
                     flash('Book added successfully', 'success')
                 except IntegrityError:
                     db.session.rollback()
-                    flash('Error adding book', 'error')
+                    flash('Error adding book, Invalid!', 'error')
             else:
-                flash('Invalid file format', 'error')
+                flash('Invalid file format!', 'error')
 
         elif action == 'add_section':
             name = request.form.get('section_name')
@@ -537,9 +536,11 @@ def list_all_users():
 @app.route('/users/details', methods=['GET'])
 @loged_in_user
 def view_users_details():
-    users = User.query.filter(User.is_librarian == False, User.is_admin == False, User.is_author == False   ).all()
+    users = User.query.filter(User.is_librarian == False, User.is_admin == False, User.is_author == False).all()
+
     if not users:
-        return render_template('librarian/user_details.html', message="There are no active users registered.")
+        flash('There are no active users!', 'error')
+        return render_template('librarian/user_details.html')
 
     for user in users:
         user.unapproved_requests = UserBook.query.filter_by(user_id=user.id, is_approved=False, is_rejected=False, t_return=None, t_deadline=None).all()
@@ -647,7 +648,7 @@ def admin():
             librarian_requests = LibrarianRequest.query.all()
             return render_template('admin/admin_panel.html', librarian_requests=librarian_requests)
         else:
-            flash("Access Denied! Wrong ADMIN Password!")
+            flash("Access Denied! Wrong ADMIN Password!", 'admin')
             return render_template('home_page/login.html', error='Invalid password')
 
 
@@ -851,7 +852,7 @@ def edit_or_delete_book(book_id):
 
     if not book:
         flash('Book not found', 'error')
-        return redirect(url_for('your_book_listing_function'))  
+        return redirect(url_for('view_book'))  
 
     if request.method == 'POST':
         action = request.form.get('action')
@@ -966,7 +967,7 @@ def manage_books(author_name):
                     flash('Book updated successfully', 'success')
                 except Exception as e:
                     db.session.rollback()
-                    flash('Error updating book: ' + str(e), 'error')
+                    flash('Error updating Book: ' + str(e), 'error')
 
                 return redirect(url_for('manage_books', author_name=author_name))
             elif action == 'delete_book':
@@ -983,7 +984,7 @@ def manage_books(author_name):
                     flash('Book deleted successfully', 'success')
                 except Exception as e:
                     db.session.rollback()
-                    flash('Error deleting book: ' + str(e), 'error')
+                    flash('Error deleting Book: ' + str(e), 'error')
 
                 return redirect(url_for('manage_books', author_name=author_name))
         else:
@@ -992,7 +993,7 @@ def manage_books(author_name):
             new_book_content = request.files.get('newBookContent')
 
             if not all([new_book_name, new_book_section_id, new_book_content]):
-                flash('Missing data for adding book', 'error')
+                flash('Missing data for adding Book', 'error')
                 return redirect(url_for('manage_books', author_name=author_name))
 
             try:
@@ -1006,7 +1007,7 @@ def manage_books(author_name):
                 flash('Book added successfully', 'success')
             except Exception as e:
                 db.session.rollback()
-                flash('Error adding book: ' + str(e), 'error')
+                flash('Error adding Book: ' + str(e), 'error')
 
             return redirect(url_for('manage_books', author_name=author_name))
 

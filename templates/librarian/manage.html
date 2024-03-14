@@ -162,6 +162,18 @@ body {
   </style>
   </head>
   <body>
+    <script>
+      window.addEventListener('DOMContentLoaded', (event) => {
+          let errorMessage = '{{ get_flashed_messages(category_filter=["error"])[0] if get_flashed_messages(category_filter=["error"]) }}';
+          if (errorMessage && errorMessage.includes('Invalid')) {
+              alert(errorMessage);
+          }
+          let successMessage = '{{ get_flashed_messages(category_filter=["success"])[0] if get_flashed_messages(category_filter=["success"]) }}';
+          if (successrMessage && successMessage.includes('Book')) {
+              alert(successMessage);
+          }
+      });
+  </script>
     {% include 'dashboards/navbar.html' %}
     <div class="container dashboard-container"></div>
     <section id="add-books">

@@ -16,6 +16,7 @@ class User(db.Model):
     is_librarian = Column(Boolean, default=False)
     is_admin = Column(Boolean, default=False)
     is_author = Column(Boolean, default=False) 
+    role = Column(String(50), nullable=True)
 
     user_books = db.relationship('UserBook', back_populates='user', lazy=True)
 
