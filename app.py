@@ -886,9 +886,6 @@ def edit_or_delete_book(book_id):
                 print("Error:", e)
                 flash('Error updating book: ' + str(e), 'error')
 
-
-
-
         elif action == 'delete_book':
             try:
                 db.session.delete(book)
@@ -953,21 +950,36 @@ def manage_books(author_name):
                     flash('Book not found', 'error')
                     return redirect(url_for('manage_books', author_name=author_name))
 
-                new_name = request.form.get('name')
-                new_section_id = request.form.get('section_id')
+                # Get current values of the book
+                current_name = book.name
+                current_section_id = book.section_id
+                current_price = book.price
+                current_content = book.content
+                current_filename = os.path.basename(current_content) if current_content else None
+                # Get new values from the form or use current values if not provided
+                new_name = request.form.get('name', current_name)
+                new_section_id = request.form.get('section_id', current_section_id)
                 new_content = request.files.get('content')
-                new_price = request.form.get('price')
-                if new_name:
-                    book.name = new_name
-                if new_section_id:
-                    book.section_id = new_section_id
+                new_price = request.form.get('price', current_price)
+
+                if new_name == '':
+                    new_name = current_name
+                if new_section_id == '':
+                    new_section_id = current_section_id
+                if new_price == '':
+                    new_price = current_price
+
+                # Update book with new values
+                book.name = new_name
+                book.section_id = new_section_id
                 if new_content:
                     filename = secure_filename(new_content.filename)
                     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                     new_content.save(filepath)
                     book.content = filepath
-                if new_price:
-                    book.price = new_price
+                    book.filename = filename
+                book.price = new_price
+
                 try:
                     db.session.commit()
                     flash('Book updated successfully', 'success')
@@ -976,6 +988,7 @@ def manage_books(author_name):
                     flash('Error updating Book: ' + str(e), 'error')
 
                 return redirect(url_for('manage_books', author_name=author_name))
+
             elif action == 'delete_book':
                 book_id = request.form.get('book_id')
                 book = Book.query.get(book_id)
