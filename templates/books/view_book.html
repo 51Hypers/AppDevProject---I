@@ -3,80 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ book.name }}</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <style>
         body {
             background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
             color: white;
             font-family: 'Roboto', sans-serif;
             margin: 0;
-            padding: 100px 0;
+            padding-top: 100px; /* Adjusted padding to avoid navbar overlap */
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 10vh;
+            min-height: 100vh;
         }
 
-        h1, p {
-            text-align: center;
+        .content {
+            padding: 2rem;
+            background-color: #231f59;
+            border-radius: 15px;
+            margin-top: 2rem; /* Space from the navbar */
+            width: 50%; /* Or any other width you prefer */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional shadow for depth */
         }
 
-        a {
+        h1 {
+            margin-bottom: 1rem;
+        }
+
+        p {
+            margin-bottom: 2rem;
+        }
+
+        a.btn {
             background-color: #484282;
             color: white;
             padding: 10px 20px;
-            margin: 20px 0;
             border-radius: 4px;
             text-decoration: none;
             transition: background-color 0.3s ease;
+            display: block; /* Make it block to have it on its own line */
+            width: fit-content; /* Fit to the size of the text */
+            margin: 0 auto; /* Center the button */
         }
 
-        a:hover {
+        a.btn:hover {
             background-color: #5a579e;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 12px 56px 0 rgba(0, 0, 0, 0.24),
+                        0 17px 50px 0 rgba(0, 0, 0, 0.19);
         }
 
-        .back-link {
-            margin-top: 20px;
-            display: inline-block;
-            background-color: transparent;
-            padding: 0;
-            box-shadow: none;
-            transition: color 0.3s ease;
-        }
-
-        .back-link:hover {
+        a.back-link {
             background-color: transparent;
             color: #AAA;
+            padding: 0;
+            transition: color 0.3s ease;
+            display: block;
+            margin: 1rem auto;
+            width: fit-content;
         }
 
-        body {
-            background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
-            color: white;
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+        a.back-link:hover {
+            color: #CCC;
         }
 
-        /* Navbar styles */
         .navbar {
-            background-color: #302b63; /* Navbar fixed background */
+            background-color: #302b63;
             position: fixed;
             width: 100%;
             top: 0;
             z-index: 1000;
         }
 
-        /* Navbar links */
         .navbar a {
             color: white;
-            background-color: transparent; /* No background color for the buttons */
+            background-color: transparent;
             text-decoration: none;
         }
 
-        /* Ensuring navbar links do not change on hover */
         .navbar a:hover {
             color: white;
             background-color: transparent;
@@ -86,12 +88,12 @@
 <body>
     {% include 'dashboards/usernav.html' %}
 
-    <main style="padding-top: 60px;"> <!-- Added padding to avoid content being hidden behind the navbar -->
+    <div class="content">
         <h1>{{ book.name }}</h1>
         <p>Author: {{ book.author }}</p>
-        <p><a href="{{ url_for('print_pdf', filename=book.content.replace('\\', '/')) }}" target="_blank">View PDF</a></p><br>
-        <p><a href="{{ url_for('view_borrowed_books_with_deadlines') }}" target="_blank">Back to Books with Deadlines</a></p>
-    </main>
+        <a href="{{ url_for('print_pdf', filename=book.content.replace('\\', '/')) }}" target="_blank" class="btn">View PDF</a>
+        <a href="{{ url_for('view_borrowed_books_with_deadlines') }}" class="back-link">Back to Books with Deadlines</a>
+    </div>
 
     <script>
         window.addEventListener('DOMContentLoaded', (event) => {
