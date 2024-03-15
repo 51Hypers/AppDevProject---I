@@ -453,8 +453,9 @@ def manage():
             file = request.files['content'] 
             author = request.form.get('author')
             section_id = request.form.get('section_id')
+            price = request.form.get('price')
 
-            if not all([name, author, section_id]) or file.filename == '':
+            if not all([name, author, section_id, price]) or file.filename == '':
                 flash('Missing data', 'error')
                 return redirect(url_for('manage'))
 
@@ -464,7 +465,7 @@ def manage():
                 file.save(filepath)
 
                 try:
-                    book = Book(name=name, content=filepath, author=author, section_id=section_id)
+                    book = Book(name=name, content=filepath, author=author, section_id=section_id, price=price)
                     db.session.add(book)
                     db.session.commit()
                     flash('Book added successfully', 'success')
@@ -841,7 +842,7 @@ def edit_or_delete_book(book_id):
 
     if not book:
         flash('Book not found', 'error')
-        return redirect(url_for('view_book'))  
+        return redirect(url_for('manage'))
 
     if request.method == 'POST':
         action = request.form.get('action')
@@ -851,30 +852,42 @@ def edit_or_delete_book(book_id):
             file = request.files.get('content')
             author = request.form.get('author')
             section_id = request.form.get('section_id')
+            price = request.form.get('price')
+
+            print(f"Book ID from URL: {book_id}")
+            print(f"Form Data - Name: {name}, Author: {author}, Section ID: {section_id}, Price: {price}")
 
             # Validate input
-            if not all([name, author, section_id]) or not file or not allowed_file(file.filename):
-                flash('Missing data or file is not allowed', 'error')
+            if not all([name, author, section_id, price]):
+                flash('Missing data', 'error')
                 return redirect(request.url)
+
 
             if file and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 file.save(filepath)
-                
-                # Update book content path instead of direct content
+
                 book.content = os.path.join('uploads', filename)
 
             book.name = name
             book.author = author
             book.section_id = section_id
-            
+            book.price = price
+
+            print(f"Book attributes after update - Name: {book.name}, Author: {book.author}, Section ID: {book.section_id}, Price: {book.price}")
+
             try:
                 db.session.commit()
+                print("Commit successful")
                 flash('Book updated successfully', 'success')
-            except:
+            except Exception as e:
                 db.session.rollback()
-                flash('Error updating book', 'error')
+                print("Error:", e)
+                flash('Error updating book: ' + str(e), 'error')
+
+
+
 
         elif action == 'delete_book':
             try:
@@ -882,13 +895,15 @@ def edit_or_delete_book(book_id):
                 db.session.commit()
                 flash('Book deleted successfully', 'success')
                 return redirect(url_for('manage'))
-            except:
+            except Exception as e:
                 db.session.rollback()
-                flash('Error deleting book', 'error')
+                flash('Error deleting book: ' + str(e), 'error')
 
-        return redirect(request.url)  
+        return redirect(url_for('edit_or_delete_book', book_id=book_id))
 
     return render_template('books/edit_books.html', book=book, sections=sections)
+
+
 
 
 
@@ -941,7 +956,7 @@ def manage_books(author_name):
                 new_name = request.form.get('name')
                 new_section_id = request.form.get('section_id')
                 new_content = request.files.get('content')
-
+                new_price = request.form.get('price')
                 if new_name:
                     book.name = new_name
                 if new_section_id:
@@ -951,7 +966,8 @@ def manage_books(author_name):
                     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                     new_content.save(filepath)
                     book.content = filepath
-
+                if new_price:
+                    book.price = new_price
                 try:
                     db.session.commit()
                     flash('Book updated successfully', 'success')
@@ -981,8 +997,8 @@ def manage_books(author_name):
             new_book_name = request.form.get('newBookName')
             new_book_section_id = request.form.get('newBookSection')
             new_book_content = request.files.get('newBookContent')
-
-            if not all([new_book_name, new_book_section_id, new_book_content]):
+            new_book_price = request.form.get('newBookPrice')
+            if not all([new_book_name, new_book_section_id, new_book_content, new_book_price]):
                 flash('Missing data for adding Book', 'error')
                 return redirect(url_for('manage_books', author_name=author_name))
 
@@ -991,7 +1007,7 @@ def manage_books(author_name):
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 new_book_content.save(filepath)
 
-                new_book = Book(name=new_book_name, author=author_name, section_id=new_book_section_id, content=filepath)
+                new_book = Book(name=new_book_name, author=author_name, section_id=new_book_section_id, content=filepath, price=new_book_price)
                 db.session.add(new_book)
                 db.session.commit()
                 flash('Book added successfully', 'success')
