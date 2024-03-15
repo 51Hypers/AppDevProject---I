@@ -5,14 +5,14 @@
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #FFF9C4; /* Light yellow background */
+            background-color: #FFF9C4; 
             margin: 0;
             padding: 20px;
             color: #555;
         }
 
         h1 {
-            color: #FFA000; /* Amber color for the title */
+            color: #FFA000;
             text-align: center;
             margin-bottom: 20px;
         }
@@ -27,11 +27,11 @@
         }
 
         li {
-            background-color: #FFECB3; /* Lighter yellow for the bubbles */
+            background-color: #FFECB3; 
             margin: 10px;
             padding: 20px;
-            border-radius: 50%; /* Makes the bubbles circular */
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Soft shadow for depth */
+            border-radius: 50%; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2); 
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             width: 120px;
             height: 120px;
@@ -43,28 +43,28 @@
         }
 
         li:hover {
-            transform: scale(1.05); /* Slightly enlarges the bubble on hover */
-            box-shadow: 0 6px 12px rgba(0,0,0,0.3); /* Stronger shadow for hover effect */
+            transform: scale(1.05); 
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3); 
         }
 
         a {
             display: inline-block;
-            background-color: #FF9800; /* Orange color for buttons */
+            background-color: #FF9800; 
             color: #fff;
             text-decoration: none;
             padding: 10px 15px;
             border-radius: 5px;
             transition: background-color 0.3s ease;
-            margin-top: 10px; /* Adjusted for spacing */
+            margin-top: 10px; 
             text-align: center;
         }
 
         a:hover, .manage-link:hover {
-            background-color: #F57C00; /* Darker orange on hover */
+            background-color: #F57C00; 
         }
 
         .manage-link {
-            background-color: #FB8C00; /* Slightly different orange for manage link */
+            background-color: #FB8C00; 
             display: block;
             margin: 20px auto;
             width: fit-content;
@@ -72,6 +72,18 @@
     </style>
 </head>
 <body>
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            let errorMessage = '{{ get_flashed_messages(category_filter=["error"])[0] if get_flashed_messages(category_filter=["error"]) }}';
+            if (errorMessage && errorMessage.includes('Error')) {
+                alert(errorMessage);
+            }
+            let successMessage = '{{ get_flashed_messages(category_filter=["success"])[0] if get_flashed_messages(category_filter=["success"]) }}';
+            if (successMessage && successMessage.includes('Book')) {
+                alert(successMessage);
+            }
+        });
+    </script>
     <h1>{{ author.username }}'s Books</h1>
     <ul>
         {% for book in books %}

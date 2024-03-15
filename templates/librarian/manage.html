@@ -22,13 +22,13 @@ section {
 }
 
 h1 {
-  text-align: center; /* Centered headings */
-  margin-bottom: 30px; /* Space below headings */
+  text-align: center;
+  margin-bottom: 30px; 
 }
 
 label {
-  display: block; /* Labels are block level for better structure */
-  margin-top: 20px; /* Margin on top for spacing */
+  display: block; 
+  margin-top: 20px; 
 }
 
 input[type="text"],input[type="number"],
@@ -39,8 +39,8 @@ select {
   margin-top: 5px;
   border: none;
   border-radius: 4px;
-  background-color: #343a40; /* Match section background */
-  color: #fff; /* Ensure text is visible */
+  background-color: #343a40; 
+  color: #fff; 
 }
 
 input[type="submit"] {
@@ -61,7 +61,7 @@ input[type="submit"] {
 
 input[type="submit"]:hover {
   background-color: #a00;
-  color: white; /* Scale effect on hover */
+  color: white; 
 }
 
 
@@ -76,11 +76,11 @@ li {
   margin-top: 10px;
   padding: 10px;
   border-radius: 4px;
-  transition: background-color 0.2s ease, transform 0.2s ease; /* Added transition for transform */
+  transition: background-color 0.2s ease, transform 0.2s ease; 
 }
 
 li:hover {
-  transform: scale(1.05); /* Scale effect on hover */
+  transform: scale(1.05); 
 }
 
 #section_id {
@@ -89,13 +89,13 @@ li:hover {
 
 body {
             color: #fff;
-            background-color: #343a40; /* Dark gray background */
+            background-color: #343a40; 
         }
         h1, h2 {
-            font-size: 2.5em; /* Bigger heading size */
-            font-weight: 700; /* Make headings bolder */
+            font-size: 2.5em; 
+            font-weight: 700; 
             color: white;
-            text-shadow: 1px 1px 2px #000; /* Soft shadow for depth */
+            text-shadow: 1px 1px 2px #000; 
             margin-bottom: 0.5em;
         }
         .dashboard-container {
@@ -104,51 +104,50 @@ body {
             margin-top: 20px;
         }
         .container {
-            max-width: 960px; /* Adjust container width for better alignment */
+            max-width: 960px; 
             margin: auto;
             padding: 0 20px;
         }
         .section {
-            background-color: #ffffff21; /* Slightly transparent white for inner sections */
+            background-color: #ffffff21;
             margin: 10px 0;
             padding: 20px;
             border-radius: 8px;
         }
         .stats-section:hover, .section:hover {
-            transform: scale(1.02); /* Slight scale on hover */
+            transform: scale(1.02); 
         }
         .list-group-item {
-            background-color: #343a40; /* Matching the body background */
-            border: 1px solid #555; /* Adding a slight border for definition */
-            transition: background-color 0.2s ease; /* Smooth transition for hover effect */
+            background-color: #343a40; 
+            border: 1px solid #555; 
+            transition: background-color 0.2s ease; 
         }
         .list-group-item:hover {
-            background-color: #40474e; /* Slightly lighter on hover */
+            background-color: #40474e; 
         }
         .maroon-background {
-            background-color: #580000; /* Maroon background */
+            background-color: #580000; 
         }
         .book-list {
         list-style: none;
         padding: 0;
     }
     .book-item {
-        background-color: #580000; /* Maroon background for each book item */
+        background-color: #580000;
         margin: 10px 0;
         padding: 15px;
         border-radius: 8px;
-        transition: transform 0.2s; /* Animation effect */
+        transition: transform 0.2s; 
     }
     .book-item:hover {
-        transform: scale(1.02); /* Slight scale on hover */
+        transform: scale(1.02); 
     }
     .book-info {
         color: #fff;
-        margin-bottom: 10px; /* Spacing between the book info and the button */
+        margin-bottom: 10px; 
     }
     .edit-btn {
-        /* Styling for the edit button */
-        background-color: #900; /* Darker grey background */
+        background-color: #900; 
         color: #fff;
         padding: 5px 10px;
         border: none;
@@ -157,7 +156,7 @@ body {
         transition: background-color 0.2s ease;
     }
     .edit-btn:hover {
-        background-color: #505c66; /* Lighter grey on hover */
+        background-color: #505c66; 
     }
 
   </style>
@@ -184,7 +183,6 @@ body {
         <label for="name">Name:</label><br />
         <input type="text" id="name" name="name" required/><br />
         <label for="content">PDF Content:</label><br />
-        <!-- Change to input type file for PDF upload -->
         <input type="file" id="content" name="content" required/><br />
         <label for="author">Author:</label><br />
         <input type="text" id="author" name="author" required/><br />

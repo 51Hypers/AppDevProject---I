@@ -18,7 +18,7 @@
           #24243e,
           #302b63,
           #0f0c29
-        ); /* Adjust background color */
+        );
       }
       .dashboard-container {
         display: flex;
@@ -36,7 +36,7 @@
       .all-books,
       .all-sections,
       .search-books {
-        background-color: #2f2b64; /* Maroon background */
+        background-color: #2f2b64;
         margin: 10px;
         padding: 20px;
         border-radius: 12px;
@@ -128,7 +128,7 @@
       });
   </script>
     {% include 'dashboards/usernav.html' %}
-    <div class="container" style="padding-top: 6rem">
+    <div class="container" style="padding-top: 6rem"> 
       <h2 class="text-center my-4">User Dashboard</h2>
       <div class="dashboard-container">
         <div class="dashboard-left">
@@ -138,7 +138,7 @@
             <h2>Section Distribution</h2>
             <canvas id="sectionPieChart" width="400" height="400"></canvas>
           </div>
-          <!-- All Books -->
+
           <div class="all-books">
             <h4>Available Books</h4>
             <a
@@ -146,7 +146,7 @@
               class="btn btn-custom btn-sm"
               >View & Request Books</a
             >
-            <!-- Search Books -->
+
             <div class="search-books">
               <h4>Search Books</h4>
               <h1>Filter Books</h1>
@@ -170,7 +170,7 @@
               class="btn btn-custom btn-sm"
               >Bought Books</a
             >
-              
+
             <h2>Revoked Books</h2>
             <ul>
               {% for user_book, book in revbook %}
@@ -178,7 +178,7 @@
               {% endfor %}
             </ul>
 
-            <!-- Deadlines -->
+
             <div class="deadlines">
               <h4>Borrowed Books and Upcoming Deadlines</h4>
               <ul>
@@ -197,10 +197,10 @@
               >
             </div>
 
-            <!-- Finished Books -->
+
             <div class="finished-books">
               <h4>Finished Books</h4>
-              <!-- Placeholder for Finished Books List -->
+
               <a
                 href="{{ url_for('view_finished_books') }}"
                 class="btn btn-custom btn-sm"
@@ -209,20 +209,20 @@
             </div>
           </div>
           <div class="dashboard-column">
-            <!-- Waiting for Approval -->
+
             <div class="waiting-approval">
               <h4>Waiting for Approval</h4>
-              <!-- Placeholder for Books Waiting Approval -->
+
               <a
                 href="{{ url_for('requested_books') }}"
                 class="btn btn-custom btn-sm"
                 >View Requests</a
               >
             </div>
-            <!-- Finished Sections -->
+
             <div class="finished-sections">
               <h4>Finished Sections</h4>
-              <!-- Placeholder for Finished Sections List -->
+
               <a
                 href="{{ url_for('view_finished_books_by_section') }}"
                 class="btn btn-custom btn-sm"

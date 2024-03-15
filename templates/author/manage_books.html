@@ -119,6 +119,18 @@
     </script>
   </head>
   <body>
+    <script>
+      window.addEventListener('DOMContentLoaded', (event) => {
+          let errorMessage = '{{ get_flashed_messages(category_filter=["error"])[0] if get_flashed_messages(category_filter=["error"]) }}';
+          if (errorMessage && errorMessage.includes('Error')) {
+              alert(errorMessage);
+          }
+          let successMessage = '{{ get_flashed_messages(category_filter=["success"])[0] if get_flashed_messages(category_filter=["success"]) }}';
+          if (successMessage && successMessage.includes('Book')) {
+              alert(successMessage);
+          }
+      });
+  </script>
     <h1>Manage Books for {{ author_name }}</h1>
     <form method="POST" enctype="multipart/form-data">
       <input type="hidden" name="author_name" value="{{ author_name }}" />

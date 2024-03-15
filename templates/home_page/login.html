@@ -4,8 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
-    <!-- Ensure you link your CSS correctly -->
-    <link rel="stylesheet" href="<!-- Your CSS file link here, if any -->">
     <style>
         .error-message {
             color: red;
@@ -37,6 +35,10 @@
             let wrapperMessage = '{{ get_flashed_messages(category_filter=["wrapper_flash_user"])[0] if get_flashed_messages(category_filter=["wrapper_flash_user"]) }}';
             if (wrapperMessage && wrapperMessage.includes('Access')) {
                 alert(wrapperMessage);
+            }
+            let alertMessage = '{{ get_flashed_messages(category_filter=["alert"])[0] if get_flashed_messages(category_filter=["alert"]) }}';
+            if (alertMessage && alertMessage.includes('Account')) {
+                alert(alertMessage);
             }
         });
     </script>

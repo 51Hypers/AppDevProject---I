@@ -96,9 +96,15 @@ def signup():
         elif role == 'librarian':
             new_librarian_request = LibrarianRequest(username=username, email=email, password=password, role=role)
             db.session.add(new_librarian_request)
+            flash('Account Request sent to admin successfully!', 'alert')
+            db.session.commit()
+            return redirect(url_for('login'))
         elif role == 'author':
             new_author_request = LibrarianRequest(username=username, email=email, password=password, role=role)
             db.session.add(new_author_request)
+            flash('Account Request sent to admin successfully!', 'alert')
+            db.session.commit()
+            return redirect(url_for('login'))
         db.session.commit()
         flash('Account created successfully', 'success')
         return redirect(url_for('login'))
@@ -240,7 +246,7 @@ def view_borrowed_books():
 def request_book(book_id):
     user_id = session.get('user_id')  
 
-    active_requests = UserBook.query.filter_by(user_id=user_id, is_returned=False).count()
+    active_requests = UserBook.query.filter_by(user_id=user_id, is_approved=False, is_rejected=False, t_return=None, t_deadline=None).count()
     if active_requests >= 5:
         flash('You have reached the maximum number of book requests.', 'error')
         return redirect(url_for('list_all_books'))
@@ -926,9 +932,6 @@ def author_page(author_name):
     author_books = Book.query.filter_by(author=author_name).all()
     author = User.query.filter_by(username=author_name).first()
 
-    if author is None:
-        return "Author not found", 404
-
     return render_template('author/author.html', author=author, books=author_books)
 
 
@@ -948,7 +951,7 @@ def manage_books(author_name):
 
                 if not book:
                     flash('Book not found', 'error')
-                    return redirect(url_for('manage_books', author_name=author_name))
+                    return redirect(url_for('manage_books', author=author_name, books=author_books))
 
                 # Get current values of the book
                 current_name = book.name
@@ -983,9 +986,11 @@ def manage_books(author_name):
                 try:
                     db.session.commit()
                     flash('Book updated successfully', 'success')
+                    return redirect(url_for('author_page', author_name=author_name))
                 except Exception as e:
                     db.session.rollback()
                     flash('Error updating Book: ' + str(e), 'error')
+                    return redirect(url_for('author_page', author_name=author_name))
 
                 return redirect(url_for('manage_books', author_name=author_name))
 
@@ -1001,9 +1006,11 @@ def manage_books(author_name):
                     db.session.delete(book)
                     db.session.commit()
                     flash('Book deleted successfully', 'success')
+                    return redirect(url_for('author_page', author_name=author_name))
                 except Exception as e:
                     db.session.rollback()
                     flash('Error deleting Book: ' + str(e), 'error')
+                    return redirect(url_for('author_page', author_name=author_name))
 
                 return redirect(url_for('manage_books', author_name=author_name))
         else:
@@ -1012,7 +1019,7 @@ def manage_books(author_name):
             new_book_content = request.files.get('newBookContent')
             new_book_price = request.form.get('newBookPrice')
             if not all([new_book_name, new_book_section_id, new_book_content, new_book_price]):
-                flash('Missing data for adding Book', 'error')
+                flash('Error! Missing data for adding Book', 'error')
                 return redirect(url_for('manage_books', author_name=author_name))
 
             try:
@@ -1024,9 +1031,11 @@ def manage_books(author_name):
                 db.session.add(new_book)
                 db.session.commit()
                 flash('Book added successfully', 'success')
+                return redirect(url_for('author_page', author_name=author_name))
             except Exception as e:
                 db.session.rollback()
                 flash('Error adding Book: ' + str(e), 'error')
+                return redirect(url_for('author_page', author_name=author_name))
 
             return redirect(url_for('manage_books', author_name=author_name))
 
