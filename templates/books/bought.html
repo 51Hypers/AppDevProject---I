@@ -1,19 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <title>Purchased Books</title>
-  </head>
-  <body>
-    <h1>My Bought Books</h1>
-    <ul>
-      {% for payinfo in bought_books %}
-      <li>
-        {{ payinfo.book.name }}
-        <a href="" target="_blank">View</a>
-        <a href="">Download</a>
-      </li>
-      {% endfor %}
-    </ul>
-  </body>
+    <style>
+        body {
+            background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
+            color: white;
+        }
+
+        .container {
+            padding: 8rem 20rem;
+        }
+
+        .navbar {
+            left: 8% !important;
+        }
+
+        h1 {
+            margin-bottom: 2rem;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #231f59;
+            border-radius: 15px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            height: 10rem;
+        }
+
+        a {
+            padding: 0.5rem;
+            background-color: #484282;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        a:hover {
+            background-color: #4c459f;
+            box-shadow: 0 12px 56px 0 rgba(0, 0, 0, 0.24),
+                0 17px 50px 0 rgba(0, 0, 0, 0.19);
+        }
+
+        /* Navbar styles */
+        .navbar {
+            background-color: #302b63; /* Navbar fixed background */
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        /* Navbar links */
+        .navbar a {
+            color: white;
+            background-color: transparent; /* No background color for the buttons */
+            text-decoration: none;
+        }
+
+        /* Ensuring navbar links do not change on hover */
+        .navbar a:hover {
+            color: white;
+            background-color: transparent;
+        }
+    </style>
+</head>
+<body>
+    {% include 'dashboards/usernav.html' %}
+
+    <div class="container">
+        <h1>My Bought Books</h1>
+        <ul>
+            {% for payinfo in bought_books %}
+            <li>
+                <h2>Book Name: {{ payinfo.book.name }}</h2>
+                <h4>Author: {{ payinfo.book.author }}</h4>
+                <a href="{{ url_for('view_book', book_id=payinfo.book.id) }}" class="btn">View</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
 </html>

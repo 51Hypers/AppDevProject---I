@@ -55,9 +55,35 @@
         background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
         color: white;
       }
+
+      /* Navbar styles */
+      .navbar {
+            background-color: #302b63; /* Navbar fixed background */
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        /* Navbar links */
+        .navbar a {
+            color: white;
+            background-color: transparent; /* No background color for the buttons */
+            text-decoration: none;
+        }
+
+        /* Ensuring navbar links do not change on hover */
+        .navbar a:hover {
+            color: white;
+            background-color: transparent;
+        }
+        .navbar {
+            left: 8% !important;
+        }
     </style>
   </head>
   <body>
+    {% include 'dashboards/usernav.html' %}
     <div class="container">
       <h1>Buy Book</h1>
       <h2>{{ book.name }}</h2>

@@ -60,19 +60,31 @@
             flex-direction: column;
         }
 
-        nav {
-            background-color: #302b63;
+        /* Navbar styles */
+        .navbar {
+            background-color: #302b63; /* Navbar fixed background */
             position: fixed;
-            width: 0%;
+            width: 100%;
             top: 0;
             z-index: 1000;
+        }
+
+        /* Navbar links */
+        .navbar a {
+            color: white;
+            background-color: transparent; /* No background color for the buttons */
+            text-decoration: none;
+        }
+
+        /* Ensuring navbar links do not change on hover */
+        .navbar a:hover {
+            color: white;
+            background-color: transparent;
         }
     </style>
 </head>
 <body>
-    <nav>
-        {% include 'dashboards/usernav.html' %}
-    </nav>
+    {% include 'dashboards/usernav.html' %}
 
     <main style="padding-top: 60px;"> <!-- Added padding to avoid content being hidden behind the navbar -->
         <h1>{{ book.name }}</h1>
