@@ -5,82 +5,104 @@
     <title>Buy Book</title>
     <script src="https://js.stripe.com/v3/"></script>
     <style>
-      .container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100vh;
-        background-color: #302b63;
-      }
-
-      #payment-form {
-        width: 100%;
-        max-width: 400px;
-        padding: 20px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-      }
-
-      #card-element {
-        width: 100%;
-        padding: 10px;
-        padding-right: 0px;
-        padding-left: 2px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        margin-bottom: 20px;
-        background-color: aliceblue;
-      }
-
-      #card-errors {
-        color: red;
-        margin-bottom: 20px;
-      }
-
-      #submit {
-        padding: 10px 20px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-      }
-
-      #submit:hover {
-        background-color: #0056b3;
-      }
       body {
-        background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
-        color: white;
+          background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
+          color: white;
+          font-family: 'Roboto', sans-serif;
+          margin: 0;
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding-top: 60px; /* Adjusted to clear the fixed navbar */
       }
-
+  
+      .container {
+          padding: 4rem; /* Adjust padding to increase the container size */
+          background-color: #231f59;
+          border-radius: 15px;
+          margin-top: 5rem; /* Increase margin-top to push the container down */
+          width: 40%; /* Adjust width to match desired proportions */
+          box-shadow: 0 12px 24px rgba(0, 0, 0, 0.7); /* Stronger shadow for depth */
+          text-align: center; /* Center all text in the container */
+      }
+  
+      h1, h2, p {
+          margin: 1rem 0; /* Standardize margins for these elements */
+      }
+  
+      #payment-form {
+          background-color: transparent;
+          border: none;
+          margin-top: 2rem; /* Add space above the form */
+      }
+  
+      #card-element {
+          background-color: #484282; /* Match button styling */
+          padding: 10px;
+          border-radius: 4px;
+          margin-bottom: 1rem; /* Reduce space below card element */
+      }
+  
+      /* Style the text inside the input field */
+      .StripeElement {
+          color: white;
+          background-color: #484282;
+          padding: 10px;
+          border-radius: 4px;
+      }
+  
+      /* Change the placeholder color */
+      .StripeElement::placeholder {
+          color: #ddd; /* Lighter white color for placeholder text */
+      }
+  
+      #card-errors {
+          color: red;
+          margin-bottom: 1rem; /* Reduce space below error message */
+      }
+  
+      #submit {
+          padding: 10px 20px;
+          background-color: #484282; /* Match button styling */
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          transition: background-color 0.3s;
+          width: 100%; /* Full width of the container */
+          margin-top: 1rem; /* Add some space above the submit button */
+      }
+  
+      #submit:hover {
+          background-color: #4c459f;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+  
       /* Navbar styles */
       .navbar {
-            background-color: #302b63; /* Navbar fixed background */
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-        }
-
-        /* Navbar links */
-        .navbar a {
-            color: white;
-            background-color: transparent; /* No background color for the buttons */
-            text-decoration: none;
-        }
-
-        /* Ensuring navbar links do not change on hover */
-        .navbar a:hover {
-            color: white;
-            background-color: transparent;
-        }
-        .navbar {
-            left: 8% !important;
-        }
-    </style>
+          background-color: #302b63; /* Navbar fixed background */
+          position: fixed;
+          width: 100%;
+          top: 0;
+          z-index: 1000;
+      }
+  
+      .navbar a {
+          color: white;
+          background-color: transparent; /* No background color for the buttons */
+          text-decoration: none;
+      }
+  
+      .navbar a:hover {
+          color: white;
+          background-color: transparent;
+      }
+  
+      .navbar {
+          left: 8% !important;
+      }
+  </style>
   </head>
   <body>
     {% include 'dashboards/usernav.html' %}
@@ -92,10 +114,8 @@
 
       <form id="payment-form">
         <div id="card-element">
-          <!-- A Stripe Element will be inserted here. -->
         </div>
 
-        <!-- Used to display form errors. -->
         <div id="card-errors" role="alert"></div>
 
         <button id="submit">Submit Payment</button>
@@ -111,7 +131,7 @@
       var style = {
         base: {
           fontSize: '16px',
-          color: '#32325d',
+          color: '#ccc',
         },
       };
 

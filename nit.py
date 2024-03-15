@@ -44,7 +44,7 @@ def populate():
                 content=os.path.join(pdf_folder, pdf_file),
                 author=fk.name(),
                 section_id=section.id,
-                price=random.randint(100, 500)
+                price=random.randint(10,50)
             )
             db.session.add(book)
             db.session.commit()

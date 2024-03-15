@@ -148,6 +148,8 @@ def user_dashboard():
     return render_template('dashboards/user_dashboard.html', borrowed_books=borrowed_books,upcoming_deadlines=upcoming_deadlines,revbook=revbook)
 
 
+from sqlalchemy import collate
+
 @app.route('/books', methods=['GET'])
 @loged_in_user
 def list_all_books():
@@ -166,13 +168,13 @@ def list_all_books():
     )
 
     if sort_column == 'name':
-        sort_key = Book.name
+        sort_key = collate(Book.name, 'NOCASE')
     elif sort_column == 'author':
-        sort_key = Book.author
+        sort_key = collate(Book.author, 'NOCASE')
     elif sort_column == 'rating':
         sort_key = func.avg(Feedback.rating)
     else:
-        sort_key = Book.name
+        sort_key = collate(Book.name, 'NOCASE')
 
     if sort_order == 'asc':
         books_query = books_query.order_by(sort_key.asc())
@@ -183,7 +185,6 @@ def list_all_books():
     authors = db.session.query(Book.author).distinct().all()
 
     return render_template('books/books.html', books=books, authors=authors)
-
 
 
 #view feedback
@@ -637,7 +638,7 @@ def admin():
 
 
 @app.route('/admin/action', methods=['POST'])
-@loged_in_user
+@loged_in_admin
 def admin_action():
     action = request.form['action']
     librarian_request_id = request.form['librarian_request_id']

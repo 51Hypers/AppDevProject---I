@@ -74,22 +74,28 @@
 <body>
     <div class="container">
         <h1>Admin Panel</h1>
-        {% for request in librarian_requests %}
+        {% if librarian_requests %}
+            {% for request in librarian_requests %}
+                <div class="request-bubble">
+                    <div class="request-info">
+                        <p>Username: {{ request.username }}</p>
+                        <p>Email: {{ request.email }}</p>
+                        <p>Role: {{ request.role }}</p>
+                    </div>
+                    <div class="request-action">
+                        <form method="POST" action="/admin/action">
+                            <input type="hidden" name="librarian_request_id" value="{{ request.id }}" />
+                            <button type="submit" name="action" value="accept" class="accept">Accept</button>
+                            <button type="submit" name="action" value="reject" class="reject">Reject</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
         <div class="request-bubble">
-            <div class="request-info">
-                <p>Username: {{ request.username }}</p>
-                <p>Email: {{ request.email }}</p>
-                <p>Role: {{ request.role }}</p>
-            </div>
-            <div class="request-action">
-                <form method="POST" action="/admin/action">
-                    <input type="hidden" name="librarian_request_id" value="{{ request.id }}" />
-                    <button type="submit" name="action" value="accept" class="accept">Accept</button>
-                    <button type="submit" name="action" value="reject" class="reject">Reject</button>
-                </form>
-            </div>
+            <p>No active requests.</p>
         </div>
-        {% endfor %}
+        {% endif %}
     </div>
 </body>
 </html>
